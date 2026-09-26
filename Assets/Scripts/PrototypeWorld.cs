@@ -8,6 +8,7 @@ public class PrototypeWorld : MonoBehaviour
     {
         public string name;
         public int hunger;
+        public Color baseColor;
         public GameObject visual;
     }
 
@@ -28,6 +29,7 @@ public class PrototypeWorld : MonoBehaviour
 
     private const string SaveKey = "BosqueVivo.Prototype.Progress.v1";
     private const float DayDuration = 100f;
+    private const float WorldHalfSize = 24f;
 
     private readonly List<Resident> residents = new List<Resident>();
     private readonly List<ResourcePickup> resources = new List<ResourcePickup>();
@@ -63,7 +65,7 @@ public class PrototypeWorld : MonoBehaviour
         }
 
         RenderSettings.ambientLight = new Color(0.58f, 0.65f, 0.59f);
-        CreateBox("Solo", new Vector3(0f, -0.3f, 0f), new Vector3(48f, 0.6f, 48f), new Color(0.34f, 0.53f, 0.32f));
+        CreateBox("Solo", new Vector3(0f, -0.3f, 0f), new Vector3(WorldHalfSize * 2f, 0.6f, WorldHalfSize * 2f), new Color(0.34f, 0.53f, 0.32f));
         CreateBox("Clareira", new Vector3(0f, 0.01f, 2f), new Vector3(11f, 0.03f, 11f), new Color(0.58f, 0.51f, 0.35f));
 
         GameObject lightObject = new GameObject("Sol");
@@ -80,7 +82,7 @@ public class PrototypeWorld : MonoBehaviour
         controller.center = new Vector3(0f, 0.9f, 0f);
         GameObject cameraObject = new GameObject("Olhos do guardião");
         cameraObject.transform.SetParent(player.transform, false);
-        cameraObject.transform.localPosition = new Vector3(0f, 0.8f, 0f);
+        cameraObject.transform.localPosition = new Vector3(0f, 1.6f, 0f);
         playerCamera = cameraObject.AddComponent<Camera>();
         playerCamera.tag = "MainCamera";
         playerCamera.clearFlags = CameraClearFlags.SolidColor;
@@ -107,6 +109,7 @@ public class PrototypeWorld : MonoBehaviour
                 if (saved.depleted[i]) resources[i].Harvest();
         }
         CreateScenery();
+        CreateBoundaries();
         UpdateLighting();
 
         if (ended) FreezePlayer();
@@ -257,7 +260,11 @@ public class PrototypeWorld : MonoBehaviour
     private void AddResident(int startingHunger = 1)
     {
         int index = residents.Count;
-        Resident member = new Resident { name = "Lume " + (index + 1), hunger = startingHunger };
+        Resident member = new Resident
+        {
+            name = "Lume " + (index + 1), hunger = startingHunger,
+            baseColor = new Color(0.92f, 0.79f - (index % 3) * 0.13f, 0.40f)
+        };
         residents.Add(member);
         int column = index % 7;
         int row = index / 7;
@@ -267,8 +274,7 @@ public class PrototypeWorld : MonoBehaviour
         member.visual = resident;
         resident.transform.position = position;
         resident.transform.localScale = Vector3.one * 0.8f;
-        SetColor(resident, startingHunger >= 2 ? new Color(0.82f, 0.45f, 0.37f) :
-            new Color(0.92f, 0.79f - (index % 3) * 0.13f, 0.40f));
+        TintResident(member);
         resident.AddComponent<ResidentVisual>().phase = index * 0.8f;
         GameObject glow = GameObject.CreatePrimitive(PrimitiveType.Sphere);
         glow.name = "Núcleo luminoso";
@@ -327,11 +333,31 @@ public class PrototypeWorld : MonoBehaviour
         SetColor(beacon, new Color(1f, 0.85f, 0.52f));
     }
 
+    private static void CreateBoundaries()
+    {
+        // Paredes invisíveis na borda do solo para o guardião não cair do mundo.
+        float edge = WorldHalfSize + 0.5f;
+        Vector3[] positions = {
+            new Vector3(0f, 2f, edge), new Vector3(0f, 2f, -edge),
+            new Vector3(edge, 2f, 0f), new Vector3(-edge, 2f, 0f)
+        };
+        Vector3[] sizes = {
+            new Vector3(WorldHalfSize * 2f + 2f, 4f, 1f), new Vector3(WorldHalfSize * 2f + 2f, 4f, 1f),
+            new Vector3(1f, 4f, WorldHalfSize * 2f + 2f), new Vector3(1f, 4f, WorldHalfSize * 2f + 2f)
+        };
+        for (int i = 0; i < positions.Length; i++)
+        {
+            GameObject wall = new GameObject("Limite do bosque");
+            wall.transform.position = positions[i];
+            wall.AddComponent<BoxCollider>().size = sizes[i];
+        }
+    }
+
     private static void TintResident(Resident resident)
     {
         if (resident.visual == null) return;
         resident.visual.GetComponent<Renderer>().material.color = resident.hunger >= 2 ?
-            new Color(0.82f, 0.45f, 0.37f) : new Color(0.92f, 0.76f, 0.40f);
+            new Color(0.82f, 0.45f, 0.37f) : resident.baseColor;
     }
 
     private void UpdateLighting()
@@ -448,11 +474,9 @@ public class PrototypeWorld : MonoBehaviour
 
     private static void SetColor(GameObject obj, Color color)
     {
-        Shader shader = Shader.Find("Standard");
-        if (shader == null) shader = Shader.Find("Universal Render Pipeline/Lit");
-        Material material = new Material(shader);
-        material.color = color;
-        obj.GetComponent<Renderer>().material = material;
+        // Reaproveita o material padrão da primitiva: funciona no editor, em builds e no URP,
+        // sem depender de Shader.Find, que retorna null quando o shader não entra na build.
+        obj.GetComponent<Renderer>().material.color = color;
     }
 
     private void OnGUI()
