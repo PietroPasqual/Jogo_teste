@@ -8,7 +8,7 @@ Você é o guardião de uma pequena clareira habitada por espíritos do bosque. 
 
 Explorar a clareira → colher frutas e madeira → alimentar os moradores → construir camas → atravessar a noite → acolher um novo morador.
 
-O protótipo mede se a tensão entre crescer e cuidar da comunidade é divertida em sessões curtas. Vitória: chegar ao dia 7 sem perder todo o ânimo da comunidade.
+O protótipo mede se a tensão entre crescer e cuidar da comunidade é divertida em sessões curtas. Vitória: chegar ao dia 7 sem perder todo o ânimo da comunidade. As hortas criam uma escolha entre investir madeira em camas ou em produção futura de alimento. Uma previsão do dano da próxima noite permite decidir quando vale encerrar o dia.
 
 ## Identidade própria
 
@@ -19,10 +19,10 @@ O protótipo mede se a tensão entre crescer e cuidar da comunidade é divertida
 
 ## Próximos incrementos após testar o ciclo
 
-1. Moradores com necessidades e rotinas individuais, sem simular todos a cada frame.
+1. Moradores com rotinas e tarefas individuais, sem simular todos a cada frame.
 2. Ordens simples para ajudar a colher e construir; custo de comida versus trabalho.
 3. Novo bioma desbloqueado pela saúde do bosque e objetivos de restauração.
-4. Salvamento local e ajustes de acessibilidade (teclas, sensibilidade, legendas).
+4. Opções de acessibilidade (teclas, sensibilidade, legendas) e múltiplos arquivos de salvamento.
 5. Arte, sons e interface criados para a identidade do projeto.
 
 Decisões em aberto: tom visual (fofo, estilizado ou mais realista), público e classificação, plataforma principal e nome definitivo.

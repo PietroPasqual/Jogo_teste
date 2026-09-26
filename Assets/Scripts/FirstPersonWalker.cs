@@ -5,6 +5,7 @@ public class FirstPersonWalker : MonoBehaviour
 {
     public Camera view;
     public float walkSpeed = 5f;
+    public float runSpeed = 7.5f;
     public float mouseSensitivity = 2f;
 
     private CharacterController controller;
@@ -38,9 +39,10 @@ public class FirstPersonWalker : MonoBehaviour
         float horizontal = (Input.GetKey(KeyCode.D) ? 1f : 0f) - (Input.GetKey(KeyCode.A) ? 1f : 0f);
         float forward = (Input.GetKey(KeyCode.W) ? 1f : 0f) - (Input.GetKey(KeyCode.S) ? 1f : 0f);
         Vector3 direction = (transform.right * horizontal + transform.forward * forward).normalized;
+        float speed = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift) ? runSpeed : walkSpeed;
 
         verticalSpeed = controller.isGrounded ? -1f : verticalSpeed - 20f * Time.deltaTime;
-        controller.Move((direction * walkSpeed + Vector3.up * verticalSpeed) * Time.deltaTime);
+        controller.Move((direction * speed + Vector3.up * verticalSpeed) * Time.deltaTime);
     }
 
     private void OnDisable()
