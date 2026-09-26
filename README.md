@@ -4,9 +4,9 @@ Um jogo 3D em primeira pessoa sobre cuidar de uma pequena família de espíritos
 
 ## Abrir
 
-1. Instale **Unity 6.3 LTS** no Unity Hub. O projeto foi preparado para um projeto **3D (Built-In Render Pipeline)**.
-2. Extraia o ZIP e use **Add project from disk** no Unity Hub, escolhendo a pasta `prototipo-bosque-vivo`.
-3. Se o editor pedir uma versão de Unity diferente, abra com sua versão instalada da linha 6.3.
+1. Use **Unity 6.3 LTS (6000.3.25f1)** no Unity Hub. O projeto usa o **Built-In Render Pipeline**.
+2. Se baixou o ZIP do GitHub, extraia e selecione a pasta **`Jogo_teste-main`** em **Add project from disk**. A pasta correta contém `Assets`, `Packages` e `ProjectSettings`.
+3. Se o Hub mostrar um aviso de versão ausente para um ZIP antigo, escolha a instalação **6000.3.25f1** ou baixe o ZIP atualizado do repositório.
 4. Em **Edit → Project Settings → Player → Other Settings → Active Input Handling**, selecione **Input Manager (Old)** ou **Both**. Reinicie o editor se solicitado.
 5. Espere a compilação terminar. No menu superior, clique em **Bosque Vivo → Criar cena do protótipo**. Abra `Assets/Scenes/BosqueVivo.unity` e pressione **Play**.
 
