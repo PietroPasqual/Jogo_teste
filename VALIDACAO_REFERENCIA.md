@@ -103,3 +103,10 @@ Nenhuma alteração de malha, osso ou textura foi feita nesta etapa. Este commit
 - Tênis: a sola branca nas bordas aparece nos renders das vistas dos pés. Confere com a referência. Nenhuma alteração foi feita.
 - Novas vistas `feet_front` e `feet_side` adicionadas a `validacao/render_views.gd`.
 - Diferença observada: a calça tem manchas de camuflagem mais evidentes que a calça preta cargo da referência. Não foi corrigida nesta etapa.
+
+## Calça cargo (etapa 8)
+
+- A calça usa o mesmo primitivo e atlas `Roupa` do casaco. Por isso foi escurecida em tempo de execução, sem alterar a malha, com `pants_darken.gdshader`.
+- O shader escurece só os vértices abaixo da cintura (y ≈ 0,96 m no espaço do modelo) e dentro das pernas (|x| < 0,17 m). Os braços e o casaco não são afetados.
+- Resultado: calça quase preta, com variação sutil, como na referência.
+- Parâmetros ajustáveis no shader: `waist_y`, `leg_half_width`, `darken`, `pants_tint`.

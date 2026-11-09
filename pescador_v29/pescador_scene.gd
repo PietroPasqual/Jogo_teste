@@ -5,6 +5,7 @@ const NormalShader = preload("shoulder_normals.gdshader")
 const HairCurls = preload("hair_curls.gd")
 ## Textura da roupa com contraste e nitidez ajustados para o camuflado da referencia.
 const CLOTH_TEXTURE_PATH := "res://pescador_v29/pescador_v29_Roupa_ajustada.png"
+const PantsShader = preload("pants_darken.gdshader")
 
 var _cloth_texture: Texture2D = null
 
@@ -41,8 +42,9 @@ func _configure(node: Node) -> void:
                 lens.metallic_specular = 0.8
                 node.set_surface_override_material(surface, lens)
             elif original is StandardMaterial3D and original.resource_name == "Pescador":
-                var body := original.duplicate() as StandardMaterial3D
-                body.albedo_texture = _cloth_or(original.albedo_texture)
+                var body := ShaderMaterial.new()
+                body.shader = PantsShader
+                body.set_shader_parameter("albedo_texture", _cloth_or(original.albedo_texture))
                 node.set_surface_override_material(surface, body)
     for child in node.get_children():
         _configure(child)
