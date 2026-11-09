@@ -42,3 +42,15 @@ Referência: folha de modelo (4 vistas + close-ups) e cena in-game com o pescado
 4. Comparar renders no Godot com as vistas da referência, lado a lado.
 
 Nenhuma alteração de malha, osso ou textura foi feita nesta etapa. Este commit apenas salva o pacote do modelo.
+
+## Validação nativa executada (Godot 4.4.1, Xvfb)
+
+- Import do pacote (`godot --headless --import`): OK.
+- `demo/validate.gd`: **NATIVE_VALIDATION_PASS**, 68 ossos, erro máximo de posição 0,00000018 m, erro angular máximo 0,00098 rad, razão de área das seções entre 0,99999950 e 1,00000007.
+- Renders das vistas da referência (`validacao/renders_godot_4_4_1/`), gerados por `validacao/render_views.gd` com a cena oficial `PescadorCorrigido.tscn`: frente, lado, costas, 3/4 e close-ups de cabeça.
+
+### Achados dos renders
+
+- **Rosto:** o bloco esticado do atlas não aparece no personagem montado. O rosto renderiza correto. O "esticamento" é só o desdobramento UV, então não é um defeito visível.
+- **Cabelo:** existe, com mechas e cachos na nuca e nas laterais, mas o volume e a definição dos cachos são menores que na referência. Na frente, o cabelo fica achatado sob o chapéu.
+- **Cartões de cabelo no atlas:** estão nas duas miniaturas do canto inferior direito da textura `Rosto`. Ajustar o volume da silhueta depende principalmente da geometria, não só da textura.

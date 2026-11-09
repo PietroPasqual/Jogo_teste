@@ -1,0 +1,40 @@
+{
+  "bones": 68,
+  "engine": "4.4.1-stable (official)",
+  "max_position_error_m": 0.000000181295405354831,
+  "max_rotation_error_rad": 0.0009765625,
+  "poses": [
+    {
+      "clip": "Idle",
+      "max_bone_angle_error_rad": 0.000690533954184502,
+      "max_bone_position_error_m": 0.000000181282132416527,
+      "time": 0.0
+    },
+    {
+      "clip": "Grip_Rod",
+      "max_bone_angle_error_rad": 0.000690533954184502,
+      "max_bone_position_error_m": 0.000000181295405354831,
+      "time": 0.2
+    },
+    {
+      "clip": "Grip_Rod",
+      "max_bone_angle_error_rad": 0.0009765625,
+      "max_bone_position_error_m": 0.000000122921349543503,
+      "time": 0.4
+    },
+    {
+      "clip": "Grip_Rod",
+      "max_bone_angle_error_rad": 0.000690533954184502,
+      "max_bone_position_error_m": 0.000000181280455535671,
+      "time": 0.6
+    },
+    {
+      "clip": "Grip_Rod",
+      "max_bone_angle_error_rad": 0.0,
+      "max_bone_position_error_m": 0.000000181280455535671,
+      "time": 0.8
+    }
+  ],
+  "section_area_ratio_max": 1.00000007125322,
+  "section_area_ratio_min": 0.999999503982278
+}
