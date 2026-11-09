@@ -68,3 +68,11 @@ Nenhuma alteração de malha, osso ou textura foi feita nesta etapa. Este commit
 - Recuo das laterais: o volume de "fone de ouvido" na altura das orelhas sumiu, e a frente abaixo da linha dos olhos fica livre.
 - Ainda falta: a textura de cachos da referência. A superfície está lisa demais para bater com a massa cacheada, então a silhueta ainda não está igual.
 - Próximo passo: cartões com textura de cachos (alpha) sobre a touca, ou ondulação de maior frequência com normal map.
+
+## Cabelo com textura de cachos (etapa 3)
+
+- `pescador_v29/hair_curls_albedo.png`: textura 512×256 gerada por script, com cachos escuros na borda inferior e falhas transparentes entre eles. A parte de cima fica sólida.
+- `hair_curls.gd` aplica a textura na touca com UVs (2 repetições ao redor da cabeça) e recorte alfa. A cor do vértice fica branca para não escurecer a textura.
+- Renders: na nuca, o cabelo agora tem massa e textura cacheada. Na vista 3/4, os cachos aparecem nas laterais, sob a aba do chapéu.
+- Ainda diferente da referência: a textura usa círculos e não cachos reais, então o detalhe é mais uniforme que o da folha de referência. A cor também é um pouco mais escura.
+- Próximo passo: refinar a textura para cachos com formas irregulares, e revisar a cor do cabelo contra a amostra da referência.
