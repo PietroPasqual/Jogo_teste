@@ -60,4 +60,11 @@ Nenhuma alteração de malha, osso ou textura foi feita nesta etapa. Este commit
 - Novo `pescador_v29/hair_curls.gd`: 64 blocos de cabelo presos ao osso `head` por `BoneAttachment3D`, nunca alterando a malha do GLB, os pesos nem o rig.
 - `pescador_v29/pescador_scene.gd` chama `HairCurls.attach` para cada `Skeleton3D`.
 - Renders atualizados em `validacao/renders_godot_4_4_1/`. Na nuca e nas laterais, o volume agora aparece abaixo da aba do chapéu. A frente do rosto fica limpa.
-- Limitação: os blocos ainda parecem bolinhas separadas. A referência tem uma massa de cabelo contínua, então a silhueta ainda não está igual.
+- Limitação da etapa anterior: os blocos pareciam bolinhas separadas.
+
+## Cabelo em touca contínua (etapa 2)
+
+- `hair_curls.gd` agora gera uma malha contínua em forma de touca (44×14 vértices), presa ao osso `head`, com ondulação de cachos na borda e cor levemente variável.
+- Recuo das laterais: o volume de "fone de ouvido" na altura das orelhas sumiu, e a frente abaixo da linha dos olhos fica livre.
+- Ainda falta: a textura de cachos da referência. A superfície está lisa demais para bater com a massa cacheada, então a silhueta ainda não está igual.
+- Próximo passo: cartões com textura de cachos (alpha) sobre a touca, ou ondulação de maior frequência com normal map.

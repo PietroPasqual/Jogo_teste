@@ -1,11 +1,16 @@
 @tool
 extends Node
-## Volume de cachos do cabelo, preso ao osso "head" por BoneAttachment3D.
-## Nao altera a malha do GLB nem os pesos: apenas acrescenta blocos de cabelo
-## na nuca, nas laterais e sob a aba do chapeu, seguindo a cabeca nas animacoes.
+## Cabelo cacheado do Pescador: uma malha continua em forma de touca, presa ao
+## osso "head" por BoneAttachment3D. Nao altera a malha do GLB, os pesos nem o rig.
+## A borda inferior e as laterais recebem ondulacao para lembrar cachos.
 
-const CURL_COUNT := 64
 const SEED := 20260907
+const COLS := 44
+const ROWS := 14
+const CENTER := Vector3(0.0, 0.1, -0.012)
+const RADII := Vector3(0.098, 0.1, 0.106)
+const PHI_TOP := 0.32
+const PHI_BOTTOM := 2.12
 
 static func attach(skeleton: Skeleton3D) -> void:
     if skeleton == null or skeleton.find_bone("head") < 0:
@@ -16,30 +21,55 @@ static func attach(skeleton: Skeleton3D) -> void:
     attachment.name = "HairCurls"
     attachment.bone_name = "head"
     skeleton.add_child(attachment)
+    var hair := MeshInstance3D.new()
+    hair.name = "HairCap"
+    hair.mesh = _build_cap()
+    attachment.add_child(hair)
+
+static func _build_cap() -> ArrayMesh:
     var rng := RandomNumberGenerator.new()
     rng.seed = SEED
+    var points: Array = []
+    var colors: Array = []
+    for r in range(ROWS + 1):
+        var row_points: Array = []
+        var row_colors: Array = []
+        var t := float(r) / float(ROWS)
+        var phi := lerpf(PHI_TOP, PHI_BOTTOM, t)
+        for c in range(COLS + 1):
+            var theta := TAU * float(c) / float(COLS)
+            var dir := Vector3(sin(phi) * sin(theta), cos(phi), sin(phi) * cos(theta))
+            # Ondulacao de cachos: mais forte na borda inferior.
+            var curl := 1.0 + 0.07 * sin(theta * 11.0 + phi * 3.0) + 0.05 * sin(theta * 23.0 + phi * 7.0) + 0.035 * sin(theta * 41.0 - phi * 11.0)
+            curl += 0.12 * t * absf(sin(theta * 19.0)) + rng.randf_range(-0.045, 0.045)
+            var p := CENTER + Vector3(dir.x * RADII.x, dir.y * RADII.y, dir.z * RADII.z) * curl
+            # Recua a frente abaixo da linha dos olhos para deixar o rosto livre.
+            if p.z > 0.02 and absf(p.x) < 0.095 and p.y < 0.14:
+                p -= dir * 0.03
+            row_points.append(p)
+            var shade := rng.randf_range(-0.012, 0.012)
+            row_colors.append(Color(0.075 + shade, 0.06 + shade, 0.05 + shade))
+        points.append(row_points)
+        colors.append(row_colors)
+
+    var st := SurfaceTool.new()
+    st.begin(Mesh.PRIMITIVE_TRIANGLES)
+    for r in range(ROWS):
+        for c in range(COLS):
+            _add_vertex(st, points[r][c], colors[r][c])
+            _add_vertex(st, points[r + 1][c], colors[r + 1][c])
+            _add_vertex(st, points[r][c + 1], colors[r][c + 1])
+            _add_vertex(st, points[r][c + 1], colors[r][c + 1])
+            _add_vertex(st, points[r + 1][c], colors[r + 1][c])
+            _add_vertex(st, points[r + 1][c + 1], colors[r + 1][c + 1])
+    st.generate_normals()
     var mat := StandardMaterial3D.new()
-    mat.albedo_color = Color(0.075, 0.058, 0.05)
+    mat.vertex_color_use_as_albedo = true
     mat.roughness = 0.95
-    var mesh := SphereMesh.new()
-    mesh.radial_segments = 6
-    mesh.rings = 4
-    mesh.radius = 0.5
-    mesh.height = 1.0
-    mesh.material = mat
-    var placed := 0
-    while placed < CURL_COUNT:
-        var angle := rng.randf() * TAU
-        var ring := 0.092 + rng.randf() * 0.016
-        var pos := Vector3(cos(angle) * ring, rng.randf_range(0.03, 0.12), sin(angle) * ring)
-        # Mantem o rosto livre: nada na frente do rosto, abaixo da aba do chapeu.
-        if pos.z > 0.02 and absf(pos.x) < 0.1:
-            continue
-        var curl := MeshInstance3D.new()
-        curl.mesh = mesh
-        var s := rng.randf_range(0.018, 0.026)
-        curl.scale = Vector3(s, s * rng.randf_range(0.8, 1.2), s)
-        curl.position = pos
-        curl.rotation = Vector3(rng.randf() * TAU, rng.randf() * TAU, rng.randf() * TAU)
-        attachment.add_child(curl)
-        placed += 1
+    mat.cull_mode = BaseMaterial3D.CULL_DISABLED
+    st.set_material(mat)
+    return st.commit()
+
+static func _add_vertex(st: SurfaceTool, p: Vector3, color: Color) -> void:
+    st.set_color(color)
+    st.add_vertex(p)
