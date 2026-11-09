@@ -82,3 +82,9 @@ Nenhuma alteração de malha, osso ou textura foi feita nesta etapa. Este commit
 - `hair_curls_albedo.png` refeita com cachos de contorno irregular (polígonos em estrela), realce pequeno em cada cacho e paleta mais escura, perto da cor do cabelo da referência.
 - Renders: a nuca mostra textura cacheada irregular, com aspecto de massa crespa. Nas laterais, os cachos aparecem acima da orelha, sob a aba do chapéu.
 - Ainda diferente da referência: a coroa fica mais uniforme que a folha de referência, e não há uma medição de cor contra a amostra. A comparação continua visual.
+
+## Cabelo com coroa texturizada (etapa 5)
+
+- `hair_curls_albedo.png`: a parte superior da textura agora tem cachos pequenos e de baixo contraste. Antes era uma cor lisa.
+- Renders: a coroa aparece texturizada sob a aba do chapéu, e a nuca mantém a massa cacheada. A frente do rosto continua limpa.
+- Ainda diferente da referência: o cabelo é mais uniforme que a folha de referência, e a comparação de cor segue visual.
