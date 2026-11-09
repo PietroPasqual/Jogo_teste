@@ -1,0 +1,9 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="PackedScene" path="res://pescador_v29/pescador_v29.glb" id="1_model"]
+[ext_resource type="Script" path="res://pescador_v29/pescador_scene.gd" id="2_setup"]
+
+[node name="PescadorCorrigido" type="Node3D"]
+script = ExtResource("2_setup")
+
+[node name="Model" parent="." instance=ExtResource("1_model")]
