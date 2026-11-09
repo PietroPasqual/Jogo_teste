@@ -2,6 +2,7 @@
 extends Node3D
 const Corrective = preload("shoulder_corrective.gd")
 const NormalShader = preload("shoulder_normals.gdshader")
+const HairCurls = preload("hair_curls.gd")
 
 func _ready() -> void:
     _configure(self)
@@ -11,6 +12,8 @@ func _configure(node: Node) -> void:
         var modifier = Corrective.new()
         modifier.name = "ShoulderCorrective"
         node.add_child(modifier)
+    if node is Skeleton3D:
+        HairCurls.attach(node)
     if node is MeshInstance3D and node.mesh != null:
         for surface in range(node.mesh.get_surface_count()):
             var original: Material = node.mesh.surface_get_material(surface)

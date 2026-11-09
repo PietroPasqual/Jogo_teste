@@ -54,3 +54,10 @@ Nenhuma alteração de malha, osso ou textura foi feita nesta etapa. Este commit
 - **Rosto:** o bloco esticado do atlas não aparece no personagem montado. O rosto renderiza correto. O "esticamento" é só o desdobramento UV, então não é um defeito visível.
 - **Cabelo:** existe, com mechas e cachos na nuca e nas laterais, mas o volume e a definição dos cachos são menores que na referência. Na frente, o cabelo fica achatado sob o chapéu.
 - **Cartões de cabelo no atlas:** estão nas duas miniaturas do canto inferior direito da textura `Rosto`. Ajustar o volume da silhueta depende principalmente da geometria, não só da textura.
+
+## Ajuste de malha do cabelo (cachos)
+
+- Novo `pescador_v29/hair_curls.gd`: 64 blocos de cabelo presos ao osso `head` por `BoneAttachment3D`, nunca alterando a malha do GLB, os pesos nem o rig.
+- `pescador_v29/pescador_scene.gd` chama `HairCurls.attach` para cada `Skeleton3D`.
+- Renders atualizados em `validacao/renders_godot_4_4_1/`. Na nuca e nas laterais, o volume agora aparece abaixo da aba do chapéu. A frente do rosto fica limpa.
+- Limitação: os blocos ainda parecem bolinhas separadas. A referência tem uma massa de cabelo contínua, então a silhueta ainda não está igual.
