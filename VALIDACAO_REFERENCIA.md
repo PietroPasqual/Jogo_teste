@@ -76,3 +76,9 @@ Nenhuma alteração de malha, osso ou textura foi feita nesta etapa. Este commit
 - Renders: na nuca, o cabelo agora tem massa e textura cacheada. Na vista 3/4, os cachos aparecem nas laterais, sob a aba do chapéu.
 - Ainda diferente da referência: a textura usa círculos e não cachos reais, então o detalhe é mais uniforme que o da folha de referência. A cor também é um pouco mais escura.
 - Próximo passo: refinar a textura para cachos com formas irregulares, e revisar a cor do cabelo contra a amostra da referência.
+
+## Cabelo com cachos irregulares (etapa 4)
+
+- `hair_curls_albedo.png` refeita com cachos de contorno irregular (polígonos em estrela), realce pequeno em cada cacho e paleta mais escura, perto da cor do cabelo da referência.
+- Renders: a nuca mostra textura cacheada irregular, com aspecto de massa crespa. Nas laterais, os cachos aparecem acima da orelha, sob a aba do chapéu.
+- Ainda diferente da referência: a coroa fica mais uniforme que a folha de referência, e não há uma medição de cor contra a amostra. A comparação continua visual.
