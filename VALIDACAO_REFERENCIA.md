@@ -88,3 +88,11 @@ Nenhuma alteração de malha, osso ou textura foi feita nesta etapa. Este commit
 - `hair_curls_albedo.png`: a parte superior da textura agora tem cachos pequenos e de baixo contraste. Antes era uma cor lisa.
 - Renders: a coroa aparece texturizada sob a aba do chapéu, e a nuca mantém a massa cacheada. A frente do rosto continua limpa.
 - Ainda diferente da referência: o cabelo é mais uniforme que a folha de referência, e a comparação de cor segue visual.
+
+## Camuflagem e ombros (etapa 6)
+
+- A textura `Roupa` embutida no GLB é idêntica ao `pescador_v29_Roupa.jpg` solto. Por isso a correção não altera o GLB: o `pescador_scene.gd` aplica em tempo de execução a versão `pescador_v29_Roupa_ajustada.png`.
+- Ajuste da versão: contraste ×1,18, saturação ×1,08 e nitidez (unsharp mask). Uma primeira tentativa com saturação ×1,3 deixou o rosto alaranjado e foi descartada.
+- Aplicada no material `Pescador` (corpo) e no `ShoulderCloth` (ombros, pelo shader).
+- Renders: o padrão vermelho e branco dos ombros ficou mais nítido, e o camuflado ganhou contraste. O corpo continua escuro, como na referência.
+- Ainda não verificado: os óculos (material `Lentes fumê`) e a sola branca do tênis. Ficaram para a próxima etapa.
