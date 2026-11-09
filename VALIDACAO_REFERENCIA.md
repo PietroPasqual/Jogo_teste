@@ -96,3 +96,10 @@ Nenhuma alteração de malha, osso ou textura foi feita nesta etapa. Este commit
 - Aplicada no material `Pescador` (corpo) e no `ShoulderCloth` (ombros, pelo shader).
 - Renders: o padrão vermelho e branco dos ombros ficou mais nítido, e o camuflado ganhou contraste. O corpo continua escuro, como na referência.
 - Ainda não verificado: os óculos (material `Lentes fumê`) e a sola branca do tênis. Ficaram para a próxima etapa.
+
+## Óculos e tênis (etapa 7)
+
+- Óculos (`Lentes fumê`): o material usava a textura `Rosto`, que dava um cinza com reflexo fraco. Agora, em tempo de execução, as lentes usam cor preta (0,03), rugosidade 0,12 e especularidade metálica 0,8, o que dá o preto brilhante da referência. Verificado no close-up da frente.
+- Tênis: a sola branca nas bordas aparece nos renders das vistas dos pés. Confere com a referência. Nenhuma alteração foi feita.
+- Novas vistas `feet_front` e `feet_side` adicionadas a `validacao/render_views.gd`.
+- Diferença observada: a calça tem manchas de camuflagem mais evidentes que a calça preta cargo da referência. Não foi corrigida nesta etapa.

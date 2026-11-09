@@ -33,6 +33,13 @@ func _configure(node: Node) -> void:
                 material.shader = NormalShader
                 material.set_shader_parameter("albedo_texture", _cloth_or(original.albedo_texture))
                 node.set_surface_override_material(surface, material)
+            elif original is StandardMaterial3D and original.resource_name == "Lentes fumê":
+                var lens := original.duplicate() as StandardMaterial3D
+                lens.albedo_texture = null
+                lens.albedo_color = Color(0.03, 0.03, 0.035)
+                lens.roughness = 0.12
+                lens.metallic_specular = 0.8
+                node.set_surface_override_material(surface, lens)
             elif original is StandardMaterial3D and original.resource_name == "Pescador":
                 var body := original.duplicate() as StandardMaterial3D
                 body.albedo_texture = _cloth_or(original.albedo_texture)
