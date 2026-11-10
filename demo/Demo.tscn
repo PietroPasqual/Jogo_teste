@@ -1,0 +1,30 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="PackedScene" path="res://pescador_v29/PescadorCorrigido.tscn" id="1_model"]
+[ext_resource type="Script" path="res://demo/demo.gd" id="2_script"]
+
+[sub_resource type="Environment" id="World"]
+background_mode = 1
+background_color = Color(0.1, 0.115, 0.14, 1)
+ambient_light_source = 2
+ambient_light_color = Color(1, 1, 1, 1)
+ambient_light_energy = 1.0
+tonemap_mode = 0
+
+[node name="Demo" type="Node3D"]
+script = ExtResource("2_script")
+
+[node name="Pescador" parent="." instance=ExtResource("1_model")]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("World")
+
+[node name="Key" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.819152, -0.328990, 0.469846, 0, 0.819152, 0.573576, -0.573576, -0.469846, 0.671010, 0, 0, 0)
+light_energy = 0.15
+
+[node name="Camera" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.7, 1.1, 4)
+projection = 1
+current = true
+size = 2.7

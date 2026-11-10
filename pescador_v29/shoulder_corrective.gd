@@ -2,7 +2,10 @@
 extends SkeletonModifier3D
 ## Continuous shoulder volume controls. Runs after AnimationMixer/Skeleton posing.
 const FRACTIONS = [0.25, 0.5, 0.75]
-const BULGE = 0.0546
+## Volume extra do ombro com os bracos abaixados. O valor original (0.0546) criava
+## ombreiras salientes que nao existem na folha de referencia; com 0.0 o ombro fica
+## arredondado como na referencia. Bracos levantados nao mudam (o volume ja sumia).
+const BULGE = 0.0
 const CHAINS = [
     {"arm": "upper_arm.R", "side": "R", "root": Vector3(-0.0928822588, 0.0214941176, -0.0271998918), "end": Vector3(-0.1523660863, -0.0882602175, -0.0204386175), "pivot": Vector3(-0.1218105000, 0.0042000000, -0.0043701000), "outward": Vector3(-1.0000000000, 0.0000000000, 0.0000000000), "sections": [Vector3(-0.1645189439, 0.0122564384, -0.0261434427), Vector3(-0.1983213341, -0.0122858883, -0.0238192546), Vector3(-0.1895912041, -0.0473767958, -0.0214950666)]},
     {"arm": "upper_arm.L", "side": "L", "root": Vector3(0.0909932100, 0.0206062500, -0.0164193225), "end": Vector3(0.1479575737, -0.0881558825, -0.0202652537), "pivot": Vector3(0.1218105000, 0.0042000000, -0.0043701000), "outward": Vector3(1.0000000000, 0.0000000000, 0.0000000000), "sections": [Vector3(0.1618217610, 0.0113854464, -0.0170202493), Vector3(0.1948041376, -0.0130460706, -0.0183422881), Vector3(0.1854382018, -0.0478419604, -0.0196643270)]}

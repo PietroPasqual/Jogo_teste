@@ -1,112 +1,88 @@
-# Validação do modelo Pescador V29 contra a referência
+# Validação do Pescador V29 contra a referência
 
-## O que foi verificado (arquivos)
+Estado em 10/11/2026, com Godot 4.4.1 (Compatibility). Todas as verificações abaixo foram
+executadas, e os relatórios estão em `validacao/`.
 
-- `pescador_v29/pescador_v29.glb`: glTF 2.0, 1 malha com 5 primitivas, 4 materiais
-  (`Pescador`, `Rosto e acessórios`, `Lentes fumê`, `ShoulderCloth`), 2 texturas embutidas
-  (`Roupa` 1536×1792 e `Rosto` 2048×1360), 1 skin com 68 ossos e 5 animações
-  (`Idle`, `Grip_Rod`, `Rig_Mobility`, `Shoulder_Abduction`, `Shoulder_Stress`).
-- Hierarquia de ossos: 15 articulações de dedos por mão, `clavicle`, `upper_arm`/`forearm`/`hand`,
-  `thigh`/`shin`/`foot`, `neck`, `head`, 6 auxiliares de ombro (`shoulder_deform_*`).
-- Prévia `previa_maos_v29.webp`: comparação V28 × V29 das mãos, sem alteração de malha além das mãos.
+## Resultado
 
-## Limitações desta validação
+| Verificação | Resultado | Relatório |
+|---|---|---|
+| Malha do `.glb` (geometria, pesos, UVs, animações, texturas) | Passou, sem erros nem avisos | `validation_report_glb.json` |
+| Rig no motor (68 ossos, poses, seções do ombro, 6 animações) | Passou | `validation_report_godot_4_4_1.json` |
+| Cores contra a folha de referência (6 regiões) | Todas dentro da tolerância | `color_report.json` |
+| Demo (`project.godot`) | Abre e roda sem erros | — |
 
-- O Godot 4.4.1 não está disponível no ambiente, então `demo/validate.gd` (validação nativa de
-  ossos, ângulos e áreas das seções) **não foi executado**. Os números de `validacao/` são os
-  do autor do modelo e não foram reproduzidos aqui.
-- A comparação com a referência é visual (texturas e prévia), não medição de pixels.
+### Malha do `.glb`
 
-## Diferenças observadas em relação à referência
+- 5 primitivas, 71.157 vértices no total e 18.916 triângulos. Nenhum triângulo degenerado.
+- Normais unitárias, UVs dentro de 0..1, pesos somando 1 em todos os vértices, nenhum vértice sem peso.
+- 68 ossos, 5 animações com tempos em ordem e rotações unitárias, 2 texturas embutidas íntegras.
+- Altura do personagem: 1,886 m, com os pés em y = 0.
+- O `.glb` não foi alterado: é o arquivo original da V29.
 
-Referência: folha de modelo (4 vistas + close-ups) e cena in-game com o pescador segurando um peixe.
+### Rig no motor
 
-| Área | Referência | Modelo V29 | Status |
+- Erro máximo de posição dos ossos: 0,00000018 m. Erro máximo de ângulo: 0,00098 rad.
+- Seções do ombro sem esticar: razão de área entre 0,9999995 e 1,0000003.
+- As 5 animações originais e a `Idle_Referencia` foram amostradas em 12 instantes cada, sem valores inválidos.
+- Texturas do cabelo e da roupa carregadas como recursos importados, então funcionam no jogo exportado.
+
+### Cores medidas (mediana RGB, folha de referência × render)
+
+| Região | Referência | Modelo | Diferença máxima |
 |---|---|---|---|
-| Chapéu bucket camuflado com logo de peixe | Camuflagem nítida, logo claro na frente | Presente na textura `Roupa` e na prévia | Conferir nitidez da camuflagem |
-| Óculos escuros | Lentes pretas, reflexo marcado | Material `Lentes fumê`, rugosidade 0.38 | Conferir reflexo |
-| Cabelo cacheado | Cachos visíveis nas têmporas e na nuca | Massa escura, com borrões nas laterais do atlas `Rosto` | **Diferente** – cachos pouco definidos |
-| Rosto (bigode, cavanhaque) | Traços bem definidos | Traços presentes, mas testa e olhos com faixas esticadas no atlas | **Diferente** – textura com distorção |
-| Camuflagem da jaqueta | Blocos pretos/cinza com contraste forte | Blocos com contraste mais baixo e desfoque | **Diferente** – menor contraste |
-| Detalhes vermelhos/brancos nos ombros (`ShoulderCloth`) | Padrão vermelho e branco nítido | Presente, porém com manchas menos definidas | **Diferente** – padrão menos nítido |
-| Logo de peixe nas costas e no bolso | Presente | Presente na textura `Roupa` | Igual |
-| Cinto, tiras e bolso peitoral | Presentes | Presentes na textura `Roupa` | Igual |
-| Calça cargo com bolsos laterais | Presentes | Presentes | Igual |
-| Tênis escuros com sola branca | Presentes | Presentes | Conferir sola branca |
+| Rosto | 158, 94, 62 | 166, 100, 66 | 8 |
+| Mãos | 162, 98, 70 | 173, 109, 76 | 11 |
+| Cabelo | 20, 14, 15 | 19, 12, 12 | 3 |
+| Lentes | 18, 15, 17 | 17, 12, 14 | 3 |
+| Calça | 30, 25, 28 | 29, 24, 24 | 4 |
+| Vermelho do casaco | 140, 28, 34 | 151, 29, 37 | 11 |
 
-## Próximos passos para ficar idêntico à referência
+Tolerância usada: 22 por canal (escala 0–255).
 
-1. Refazer a textura `Rosto` com cabelo cacheado definido e corrigir o esticamento de testa e olhos.
-2. Aumentar o contraste e a nitidez da camuflagem na textura `Roupa`, principalmente nos ombros.
-3. Rodar `demo/validate.gd` no Godot 4.4.1 para confirmar que o rig não mudou.
-4. Comparar renders no Godot com as vistas da referência, lado a lado.
+## O que foi corrigido nesta revisão
 
-Nenhuma alteração de malha, osso ou textura foi feita nesta etapa. Este commit apenas salva o pacote do modelo.
+A comparação lado a lado com a folha de referência (`validacao/imagens/comparacao/`) mostrou
+problemas que as etapas anteriores não tinham pegado:
 
-## Validação nativa executada (Godot 4.4.1, Xvfb)
+1. **Ombreiras salientes.** O corretivo de ombro somava 5,5 cm de volume com os braços abaixados,
+   o que criava "ombreiras" que não existem na referência. O volume (`BULGE`) foi zerado.
+   Com os braços levantados nada muda, porque esse volume já sumia nessa pose.
+2. **Texturas que falhariam no jogo exportado.** A roupa e o cabelo eram lidos com
+   `Image.load_from_file`, e o Godot avisava que isso não funciona após exportar. Agora são
+   recursos importados, com caminho relativo à pasta do script.
+3. **Calça dependia da pose.** O shader escurecia por posição do vértice, então a região mudava
+   com a animação e pegava os tênis. Agora usa uma máscara fixa no espaço UV (`pants_mask.png`),
+   calculada pelos pesos dos ossos das pernas.
+4. **Cabelo.** A textura tinha pontos claros e as lentes estavam mais pretas que a referência.
+   O cabelo foi refeito com tufos recortados nos tons medidos, com mais volume nas laterais.
+5. **Tom das mãos.** O ajuste de contraste alterava a pele das mãos. Os tons de pele do atlas
+   agora são preservados.
+6. **Mãos abertas.** A referência tem as mãos semifechadas. A cena cria a animação
+   `Idle_Referencia`, igual ao `Idle` com os dedos parcialmente fechados.
+7. **Iluminação dos renders.** As texturas já trazem o sombreado da referência pintado. Com luz
+   forte, o modelo ficava mais claro que a folha. Os renders e a demo usam luz quase neutra.
 
-- Import do pacote (`godot --headless --import`): OK.
-- `demo/validate.gd`: **NATIVE_VALIDATION_PASS**, 68 ossos, erro máximo de posição 0,00000018 m, erro angular máximo 0,00098 rad, razão de área das seções entre 0,99999950 e 1,00000007.
-- Renders das vistas da referência (`validacao/renders_godot_4_4_1/`), gerados por `validacao/render_views.gd` com a cena oficial `PescadorCorrigido.tscn`: frente, lado, costas, 3/4 e close-ups de cabeça.
+O volume do ombro também foi a única mudança que afeta os dados do autor: os 6 ossos auxiliares
+`shoulder_deform_*` ficam 5,46 cm mais para dentro do que em `validacao/expected.json`. Isso é
+intencional, e o validador reporta esse valor à parte.
 
-### Achados dos renders
+## Diferenças que continuam
 
-- **Rosto:** o bloco esticado do atlas não aparece no personagem montado. O rosto renderiza correto. O "esticamento" é só o desdobramento UV, então não é um defeito visível.
-- **Cabelo:** existe, com mechas e cachos na nuca e nas laterais, mas o volume e a definição dos cachos são menores que na referência. Na frente, o cabelo fica achatado sob o chapéu.
-- **Cartões de cabelo no atlas:** estão nas duas miniaturas do canto inferior direito da textura `Rosto`. Ajustar o volume da silhueta depende principalmente da geometria, não só da textura.
+O modelo está próximo da referência, mas não idêntico. O que ainda difere:
 
-## Ajuste de malha do cabelo (cachos)
+- **Chapéu:** a aba é mais larga e mais caída que a da referência, e o logo de peixe fica mais alto.
+- **Capuz:** mais baixo e menos volumoso atrás do pescoço.
+- **Cabelo:** a silhueta é mais lisa. A referência tem cachos mais volumosos e recortados.
+- **Proporções:** os braços ficam mais afastados do corpo e as pernas mais abertas, por causa da pose de repouso do rig.
+- **Bolsos da calça:** menos destacados que os bolsos cargo da referência.
 
-- Novo `pescador_v29/hair_curls.gd`: 64 blocos de cabelo presos ao osso `head` por `BoneAttachment3D`, nunca alterando a malha do GLB, os pesos nem o rig.
-- `pescador_v29/pescador_scene.gd` chama `HairCurls.attach` para cada `Skeleton3D`.
-- Renders atualizados em `validacao/renders_godot_4_4_1/`. Na nuca e nas laterais, o volume agora aparece abaixo da aba do chapéu. A frente do rosto fica limpa.
-- Limitação da etapa anterior: os blocos pareciam bolinhas separadas.
+Essas diferenças são da geometria do `.glb`. Corrigi-las exige remodelar a malha em um programa
+de modelagem (por exemplo, o Blender), o que não foi feito aqui.
 
-## Cabelo em touca contínua (etapa 2)
+## Arquivos
 
-- `hair_curls.gd` agora gera uma malha contínua em forma de touca (44×14 vértices), presa ao osso `head`, com ondulação de cachos na borda e cor levemente variável.
-- Recuo das laterais: o volume de "fone de ouvido" na altura das orelhas sumiu, e a frente abaixo da linha dos olhos fica livre.
-- Ainda falta: a textura de cachos da referência. A superfície está lisa demais para bater com a massa cacheada, então a silhueta ainda não está igual.
-- Próximo passo: cartões com textura de cachos (alpha) sobre a touca, ou ondulação de maior frequência com normal map.
-
-## Cabelo com textura de cachos (etapa 3)
-
-- `pescador_v29/hair_curls_albedo.png`: textura 512×256 gerada por script, com cachos escuros na borda inferior e falhas transparentes entre eles. A parte de cima fica sólida.
-- `hair_curls.gd` aplica a textura na touca com UVs (2 repetições ao redor da cabeça) e recorte alfa. A cor do vértice fica branca para não escurecer a textura.
-- Renders: na nuca, o cabelo agora tem massa e textura cacheada. Na vista 3/4, os cachos aparecem nas laterais, sob a aba do chapéu.
-- Ainda diferente da referência: a textura usa círculos e não cachos reais, então o detalhe é mais uniforme que o da folha de referência. A cor também é um pouco mais escura.
-- Próximo passo: refinar a textura para cachos com formas irregulares, e revisar a cor do cabelo contra a amostra da referência.
-
-## Cabelo com cachos irregulares (etapa 4)
-
-- `hair_curls_albedo.png` refeita com cachos de contorno irregular (polígonos em estrela), realce pequeno em cada cacho e paleta mais escura, perto da cor do cabelo da referência.
-- Renders: a nuca mostra textura cacheada irregular, com aspecto de massa crespa. Nas laterais, os cachos aparecem acima da orelha, sob a aba do chapéu.
-- Ainda diferente da referência: a coroa fica mais uniforme que a folha de referência, e não há uma medição de cor contra a amostra. A comparação continua visual.
-
-## Cabelo com coroa texturizada (etapa 5)
-
-- `hair_curls_albedo.png`: a parte superior da textura agora tem cachos pequenos e de baixo contraste. Antes era uma cor lisa.
-- Renders: a coroa aparece texturizada sob a aba do chapéu, e a nuca mantém a massa cacheada. A frente do rosto continua limpa.
-- Ainda diferente da referência: o cabelo é mais uniforme que a folha de referência, e a comparação de cor segue visual.
-
-## Camuflagem e ombros (etapa 6)
-
-- A textura `Roupa` embutida no GLB é idêntica ao `pescador_v29_Roupa.jpg` solto. Por isso a correção não altera o GLB: o `pescador_scene.gd` aplica em tempo de execução a versão `pescador_v29_Roupa_ajustada.png`.
-- Ajuste da versão: contraste ×1,18, saturação ×1,08 e nitidez (unsharp mask). Uma primeira tentativa com saturação ×1,3 deixou o rosto alaranjado e foi descartada.
-- Aplicada no material `Pescador` (corpo) e no `ShoulderCloth` (ombros, pelo shader).
-- Renders: o padrão vermelho e branco dos ombros ficou mais nítido, e o camuflado ganhou contraste. O corpo continua escuro, como na referência.
-- Ainda não verificado: os óculos (material `Lentes fumê`) e a sola branca do tênis. Ficaram para a próxima etapa.
-
-## Óculos e tênis (etapa 7)
-
-- Óculos (`Lentes fumê`): o material usava a textura `Rosto`, que dava um cinza com reflexo fraco. Agora, em tempo de execução, as lentes usam cor preta (0,03), rugosidade 0,12 e especularidade metálica 0,8, o que dá o preto brilhante da referência. Verificado no close-up da frente.
-- Tênis: a sola branca nas bordas aparece nos renders das vistas dos pés. Confere com a referência. Nenhuma alteração foi feita.
-- Novas vistas `feet_front` e `feet_side` adicionadas a `validacao/render_views.gd`.
-- Diferença observada: a calça tem manchas de camuflagem mais evidentes que a calça preta cargo da referência. Não foi corrigida nesta etapa.
-
-## Calça cargo (etapa 8)
-
-- A calça usa o mesmo primitivo e atlas `Roupa` do casaco. Por isso foi escurecida em tempo de execução, sem alterar a malha, com `pants_darken.gdshader`.
-- O shader escurece só os vértices abaixo da cintura (y ≈ 0,96 m no espaço do modelo) e dentro das pernas (|x| < 0,17 m). Os braços e o casaco não são afetados.
-- Resultado: calça quase preta, com variação sutil, como na referência.
-- Parâmetros ajustáveis no shader: `waist_y`, `leg_half_width`, `darken`, `pants_tint`.
+- `validacao/imagens/comparacao/`: referência × render, lado a lado.
+- `validacao/imagens/renders/`: vistas e poses renderizadas.
+- `validacao/godot_4_4_1.json` e `validacao/ajuste_das_maos.json`: relatórios originais do autor da V29.
+- `validacao/expected.json`: poses esperadas pelo autor, usadas por `validate_rig.gd`.

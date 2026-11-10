@@ -1,0 +1,88 @@
+{
+  "rosto": {
+    "referencia_rgb": [
+      158,
+      94,
+      62
+    ],
+    "render_rgb": [
+      166,
+      100,
+      66
+    ],
+    "diferenca_maxima": 8,
+    "dentro_da_tolerancia": true
+  },
+  "maos": {
+    "referencia_rgb": [
+      162,
+      98,
+      70
+    ],
+    "render_rgb": [
+      173,
+      109,
+      76
+    ],
+    "diferenca_maxima": 11,
+    "dentro_da_tolerancia": true
+  },
+  "cabelo": {
+    "referencia_rgb": [
+      20,
+      14,
+      15
+    ],
+    "render_rgb": [
+      19,
+      12,
+      12
+    ],
+    "diferenca_maxima": 3,
+    "dentro_da_tolerancia": true
+  },
+  "lentes": {
+    "referencia_rgb": [
+      18,
+      15,
+      17
+    ],
+    "render_rgb": [
+      17,
+      12,
+      14
+    ],
+    "diferenca_maxima": 3,
+    "dentro_da_tolerancia": true
+  },
+  "calca": {
+    "referencia_rgb": [
+      30,
+      25,
+      28
+    ],
+    "render_rgb": [
+      29,
+      24,
+      24
+    ],
+    "diferenca_maxima": 4,
+    "dentro_da_tolerancia": true
+  },
+  "vermelho_do_casaco": {
+    "referencia_rgb": [
+      140,
+      28,
+      34
+    ],
+    "render_rgb": [
+      151,
+      29,
+      37
+    ],
+    "diferenca_maxima": 11,
+    "dentro_da_tolerancia": true
+  },
+  "tolerancia_por_canal": 22,
+  "todas_dentro_da_tolerancia": true
+}

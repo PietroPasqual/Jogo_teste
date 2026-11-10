@@ -1,6 +1,8 @@
 extends SceneTree
+## Rodar na raiz do repositorio: godot --path . -s validacao/render_views.gd
 
 # Renderiza as vistas da folha de referencia com a cena oficial PescadorCorrigido.tscn.
+# Luz quase neutra: as texturas ja trazem o sombreado da referencia pintado.
 const VIEWS := [
 	{"name": "front", "yaw": 0.0, "target": Vector3(0, 1.0, 0), "dist": 4.2, "fov": 30.0},
 	{"name": "side", "yaw": 90.0, "target": Vector3(0, 1.0, 0), "dist": 4.2, "fov": 30.0},
@@ -26,18 +28,20 @@ func run() -> void:
 	env.background_mode = Environment.BG_COLOR
 	env.background_color = Color(0.17, 0.17, 0.19)
 	env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-	env.ambient_light_color = Color(0.75, 0.75, 0.75)
+	env.ambient_light_color = Color(1.0, 1.0, 1.0)
+	env.ambient_light_energy = 1.0
+	env.tonemap_mode = Environment.TONE_MAPPER_LINEAR
 	world.environment = env
 	root.add_child(world)
 
 	var key := DirectionalLight3D.new()
 	key.rotation_degrees = Vector3(-35, 30, 0)
-	key.light_energy = 1.1
+	key.light_energy = 0.15
 	root.add_child(key)
 
 	var fill := DirectionalLight3D.new()
 	fill.rotation_degrees = Vector3(-20, -150, 0)
-	fill.light_energy = 0.4
+	fill.light_energy = 0.05
 	root.add_child(fill)
 
 	var cam := Camera3D.new()
@@ -55,6 +59,6 @@ func run() -> void:
 		await process_frame
 		await RenderingServer.frame_post_draw
 		var img := root.get_texture().get_image()
-		img.save_png("res://render_" + view["name"] + ".png")
+		img.save_png("res://validacao/imagens/renders/render_" + view["name"] + ".png")
 		print("RENDERED ", view["name"])
 	quit()

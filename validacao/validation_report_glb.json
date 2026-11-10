@@ -1,0 +1,160 @@
+{
+  "arquivo": "pescador_v29/pescador_v29.glb",
+  "bytes": 5613024,
+  "ossos": 68,
+  "primitivas": [
+    {
+      "primitiva": 0,
+      "material": "Pescador",
+      "vertices": 15091,
+      "triangulos": 4621,
+      "triangulos_degenerados": 0,
+      "caixa_min": [
+        -0.3503,
+        0.0,
+        -0.1688
+      ],
+      "caixa_max": [
+        0.3459,
+        1.5309,
+        0.1785
+      ],
+      "normais_fora_de_unidade": 0,
+      "uv_fora_de_0_1": 0,
+      "pesos_nao_normalizados": 0,
+      "vertices_sem_peso": 0
+    },
+    {
+      "primitiva": 1,
+      "material": "Rosto e acessórios",
+      "vertices": 33919,
+      "triangulos": 11538,
+      "triangulos_degenerados": 0,
+      "caixa_min": [
+        -0.1696,
+        1.4164,
+        -0.1957
+      ],
+      "caixa_max": [
+        0.178,
+        1.8858,
+        0.2084
+      ],
+      "normais_fora_de_unidade": 0,
+      "uv_fora_de_0_1": 0,
+      "pesos_nao_normalizados": 0,
+      "vertices_sem_peso": 0
+    },
+    {
+      "primitiva": 2,
+      "material": "Lentes fumê",
+      "vertices": 108,
+      "triangulos": 72,
+      "triangulos_degenerados": 0,
+      "caixa_min": [
+        -0.0786,
+        1.7002,
+        0.0878
+      ],
+      "caixa_max": [
+        0.087,
+        1.7463,
+        0.1295
+      ],
+      "normais_fora_de_unidade": 0,
+      "uv_fora_de_0_1": 0,
+      "pesos_nao_normalizados": 0,
+      "vertices_sem_peso": 0
+    },
+    {
+      "primitiva": 3,
+      "material": "Pescador",
+      "vertices": 6948,
+      "triangulos": 2316,
+      "triangulos_degenerados": 0,
+      "caixa_min": [
+        -0.3164,
+        0.809,
+        -0.0064
+      ],
+      "caixa_max": [
+        0.3164,
+        0.9514,
+        0.0376
+      ],
+      "normais_fora_de_unidade": 0,
+      "uv_fora_de_0_1": 0,
+      "pesos_nao_normalizados": 0,
+      "vertices_sem_peso": 0
+    },
+    {
+      "primitiva": 4,
+      "material": "ShoulderCloth",
+      "vertices": 15091,
+      "triangulos": 369,
+      "triangulos_degenerados": 0,
+      "caixa_min": [
+        -0.3503,
+        0.0,
+        -0.1688
+      ],
+      "caixa_max": [
+        0.3459,
+        1.5309,
+        0.1785
+      ],
+      "normais_fora_de_unidade": 0,
+      "uv_fora_de_0_1": 0,
+      "pesos_nao_normalizados": 0,
+      "vertices_sem_peso": 0
+    }
+  ],
+  "altura_m": 1.8858,
+  "assimetria_x_m": 0.0044,
+  "animacoes": [
+    {
+      "nome": "Idle",
+      "canais": 43,
+      "duracao_s": 2.0
+    },
+    {
+      "nome": "Grip_Rod",
+      "canais": 42,
+      "duracao_s": 0.8
+    },
+    {
+      "nome": "Rig_Mobility",
+      "canais": 73,
+      "duracao_s": 10.0
+    },
+    {
+      "nome": "Shoulder_Abduction",
+      "canais": 16,
+      "duracao_s": 4.0
+    },
+    {
+      "nome": "Shoulder_Stress",
+      "canais": 20,
+      "duracao_s": 6.0
+    }
+  ],
+  "texturas": [
+    {
+      "nome": "Roupa",
+      "tamanho": [
+        1536,
+        1792
+      ]
+    },
+    {
+      "nome": "Rosto",
+      "tamanho": [
+        2048,
+        1360
+      ]
+    }
+  ],
+  "erros": [],
+  "avisos": [],
+  "passou": true
+}

@@ -1,23 +1,54 @@
-# Pescador V29 — mais volume nas mãos
+# Pescador V29 — modelo para Godot
 
-Copie a pasta `pescador_v29` inteira para a raiz do seu projeto e instancie:
+Personagem pescador rigado (68 ossos), ajustado para ficar fiel à folha de referência.
+Este repositório é um projeto Godot 4.4 completo: abra o `project.godot` para ver a demo.
 
-`res://pescador_v29/PescadorCorrigido.tscn`
+## Como usar no seu jogo
 
-Use essa cena para manter a correção automática dos ombros da V27. Testado no Godot 4.4.1, Compatibility. A cena requer SkeletonModifier3D, disponível a partir do Godot 4.3.
+1. Copie a pasta `pescador_v29` inteira para a raiz do seu projeto Godot (4.3 ou mais novo).
+2. Instancie a cena `res://pescador_v29/PescadorCorrigido.tscn`.
+3. O `AnimationPlayer` fica em `Model/AnimationPlayer`.
 
-## Ajuste desta versão
+Use sempre a cena `PescadorCorrigido.tscn`, não o `.glb` direto. É ela que aplica os ajustes abaixo.
 
-A V29 dá mais volume à palma e aos dedos. O comprimento de 14,2 cm foi mantido. A largura passou de aproximadamente 8,7 para 9,6 cm e a espessura máxima de 3,45 para 4,39 cm. A transição no punho permanece gradual, sem alterar o encaixe da manga.
+## Animações
 
-O ajuste é gradual junto ao punho, preservando os vértices de encaixe da manga e a posição dos ossos das mãos. As posições de repouso das 15 articulações dos dedos de cada lado e as matrizes de ligação do esqueleto foram atualizadas para a geometria nova. Os pesos e as conexões da malha foram mantidos.
+| Animação | Uso |
+|---|---|
+| `Idle_Referencia` | Repouso com as mãos semifechadas, como na folha de referência. Criada pela cena ao carregar. |
+| `Idle` | Repouso original, com as mãos abertas. |
+| `Grip_Rod` | Fecha as mãos para segurar a vara. |
+| `Rig_Mobility`, `Shoulder_Abduction`, `Shoulder_Stress` | Testes de movimento do rig. |
 
-Rosto, roupa, óculos, ombros, corpo e texturas mantêm os dados da V28. O esqueleto continua com 68 ossos e os seis auxiliares automáticos dos ombros.
+## O que a cena ajusta (sem alterar o `.glb`)
 
-## Conferência
+O arquivo `pescador_v29.glb` é o original da V29, byte a byte. Todos os ajustes são aplicados
+por `pescador_scene.gd` quando a cena carrega:
 
-Foram conferidos os dados preservados, os pesos e a ligação da malha aos ossos. No Godot 4.4.1 foram testados o repouso e quatro momentos da flexão dos dedos. A prévia compara as duas versões em enquadramentos de mesma escala e mostra a flexão real no motor. Os resultados estão em `validacao/`.
+- **Cabelo cacheado** (`hair_curls.gd`): touca de cabelo presa ao osso da cabeça.
+- **Ombros** (`shoulder_corrective.gd`): corretivo automático, sem a ombreira saliente.
+- **Camuflado** (`pescador_v29_Roupa_ajustada.png`): mais contraste e nitidez.
+- **Calça cargo escura** (`pants_darken.gdshader` + `pants_mask.png`).
+- **Lentes escuras** dos óculos.
+- **Mãos semifechadas** na animação `Idle_Referencia`.
 
-As animações incluídas continuam sendo `Idle`, `Grip_Rod`, `Rig_Mobility`, `Shoulder_Abduction` e `Shoulder_Stress`. O AnimationPlayer está em `Model/AnimationPlayer` dentro da cena corrigida.
+## Demo
 
-O projeto `demo_validacao_godot.zip` deve ser extraído em uma pasta separada. Abra seu `project.godot` para observar os movimentos. Teclas 1 a 5 alternam animações; espaço pausa; setas giram o personagem.
+Abra o projeto e rode (F5). Teclas 1 a 6 trocam a animação, espaço pausa, setas giram o personagem.
+
+## Validação
+
+O resultado completo está em [VALIDACAO_REFERENCIA.md](VALIDACAO_REFERENCIA.md).
+Para repetir, na raiz do repositório, com Godot 4.4.1:
+
+```
+python3 validacao/ferramentas/validar_glb.py              # malha, pesos e animações do .glb
+godot --path . --headless --import                        # importa o projeto
+godot --path . -s validacao/validate_rig.gd               # rig no motor
+godot --path . -s validacao/render_views.gd               # vistas da referência
+godot --path . -s validacao/render_poses.gd               # poses das animações
+python3 validacao/ferramentas/comparar_referencia.py CAMINHO/folha_de_referencia.png
+```
+
+As texturas auxiliares são geradas por `python3 validacao/ferramentas/gerar_texturas.py`
+(requer Pillow e NumPy).

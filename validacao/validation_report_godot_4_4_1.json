@@ -1,40 +1,94 @@
 {
+  "animations": [
+    {
+      "clip": "Idle",
+      "finite": true,
+      "length_s": 2.0,
+      "max_bone_distance_m": 1.62541079521179
+    },
+    {
+      "clip": "Grip_Rod",
+      "finite": true,
+      "length_s": 0.800000011920929,
+      "max_bone_distance_m": 1.62541079521179
+    },
+    {
+      "clip": "Rig_Mobility",
+      "finite": true,
+      "length_s": 10.0,
+      "max_bone_distance_m": 1.62541079521179
+    },
+    {
+      "clip": "Shoulder_Abduction",
+      "finite": true,
+      "length_s": 4.0,
+      "max_bone_distance_m": 1.98568415641785
+    },
+    {
+      "clip": "Shoulder_Stress",
+      "finite": true,
+      "length_s": 6.0,
+      "max_bone_distance_m": 2.01015305519104
+    },
+    {
+      "clip": "Idle_Referencia",
+      "finite": true,
+      "length_s": 2.0,
+      "max_bone_distance_m": 1.62541079521179
+    }
+  ],
   "bones": 68,
+  "cloth_texture_imported": true,
   "engine": "4.4.1-stable (official)",
+  "failures": [],
+  "hair_texture_imported": true,
+  "material_overrides": {
+    "Lentes fumê": true,
+    "Pescador": true,
+    "Rosto e acessórios": false,
+    "ShoulderCloth": true
+  },
   "max_position_error_m": 0.000000181295405354831,
   "max_rotation_error_rad": 0.0009765625,
+  "passed": true,
   "poses": [
     {
       "clip": "Idle",
       "max_bone_angle_error_rad": 0.000690533954184502,
       "max_bone_position_error_m": 0.000000181282132416527,
+      "shoulder_deform_shift_m": 0.0546000003814697,
       "time": 0.0
     },
     {
       "clip": "Grip_Rod",
       "max_bone_angle_error_rad": 0.000690533954184502,
       "max_bone_position_error_m": 0.000000181295405354831,
+      "shoulder_deform_shift_m": 0.0546000003814697,
       "time": 0.2
     },
     {
       "clip": "Grip_Rod",
       "max_bone_angle_error_rad": 0.0009765625,
       "max_bone_position_error_m": 0.000000122921349543503,
+      "shoulder_deform_shift_m": 0.0546000003814697,
       "time": 0.4
     },
     {
       "clip": "Grip_Rod",
       "max_bone_angle_error_rad": 0.000690533954184502,
       "max_bone_position_error_m": 0.000000181280455535671,
+      "shoulder_deform_shift_m": 0.0546000003814697,
       "time": 0.6
     },
     {
       "clip": "Grip_Rod",
       "max_bone_angle_error_rad": 0.0,
       "max_bone_position_error_m": 0.000000181280455535671,
+      "shoulder_deform_shift_m": 0.0546000003814697,
       "time": 0.8
     }
   ],
-  "section_area_ratio_max": 1.00000007125322,
-  "section_area_ratio_min": 0.999999503982278
+  "section_area_ratio_max": 1.00000028501287,
+  "section_area_ratio_min": 0.999999503982278,
+  "shoulder_deform_max_shift_m": 0.0546000003814697
 }
