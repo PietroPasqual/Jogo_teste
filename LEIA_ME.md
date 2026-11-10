@@ -20,6 +20,13 @@ Use sempre a cena `PescadorCorrigido.tscn`, não o `.glb` direto. É ela que apl
 | `Grip_Rod` | Fecha as mãos para segurar a vara. |
 | `Rig_Mobility`, `Shoulder_Abduction`, `Shoulder_Stress` | Testes de movimento do rig. |
 
+### Usar animações de outras bibliotecas
+
+O arquivo `pescador_v29/pescador_bone_map.tres` mapeia o esqueleto para o perfil humanoide do
+Godot. Para usar: selecione `pescador_v29.glb`, abra a aba Import, clique em Advanced, selecione
+o `Skeleton3D` e, em Retarget, escolha esse arquivo como Bone Map. Faça isso em uma cópia do
+modelo: o retarget muda a pose de repouso, e o corretivo de ombro foi calculado para a pose original.
+
 ## O que a cena ajusta
 
 No `pescador_v29.glb`, só o UV de alguns triângulos da roupa foi corrigido. A malha, o rig e as
@@ -49,6 +56,7 @@ godot --path . --headless --import                        # importa o projeto
 godot --path . -s validacao/validate_rig.gd               # rig no motor
 godot --path . -s validacao/render_views.gd               # vistas da referência
 godot --path . -s validacao/render_poses.gd               # poses das animações
+godot --path . -s validacao/teste_articulacoes.gd         # teste de esforço das articulações
 python3 validacao/ferramentas/comparar_referencia.py CAMINHO/folha_de_referencia.png
 ```
 

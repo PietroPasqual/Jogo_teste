@@ -37,6 +37,12 @@
       "max_bone_distance_m": 1.62541079521179
     }
   ],
+  "bone_map_mapped": 53,
+  "bone_map_unmapped": [
+    "LeftEye",
+    "RightEye",
+    "Jaw"
+  ],
   "bones": 68,
   "cloth_texture_imported": true,
   "engine": "4.4.1-stable (official)",

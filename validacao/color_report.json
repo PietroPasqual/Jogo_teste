@@ -76,11 +76,11 @@
       34
     ],
     "render_rgb": [
-      151,
+      150,
       28,
-      36
+      35
     ],
-    "diferenca_maxima": 11,
+    "diferenca_maxima": 10,
     "dentro_da_tolerancia": true
   },
   "tolerancia_por_canal": 22,

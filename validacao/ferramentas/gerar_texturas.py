@@ -81,7 +81,13 @@ def _amostras():
 
 def _fundo(p):
     """Fundo cinza-azulado da folha de referencia."""
-    return (p[..., 2] - p[..., 0] >= 4) & (p[..., 1] >= p[..., 0] - 2)
+    azulado = (p[..., 2] - p[..., 0] >= 4) & (p[..., 1] >= p[..., 0] - 2)
+    # Na borda da silhueta o fundo vem misturado com a roupa e fica cinza neutro.
+    # A roupa nao tem cinza neutro nessa faixa de brilho: o camuflado e marrom,
+    # o colete e mais escuro, e o ziper e as fivelas sao mais claros.
+    soma = p[..., 0] + p[..., 1] + p[..., 2]
+    neutro = (p.max(-1) - p.min(-1) <= 9) & (p[..., 2] >= p[..., 0] - 3) & (soma >= 115) & (soma <= 260)
+    return azulado | neutro
 
 
 def _pele(p):
@@ -108,6 +114,12 @@ def _preencher(imagem, ruim, passos=80):
     return img
 
 
+def _vertices_da_calca(pos, dominante):
+    perna = np.array([d.startswith(("thigh", "shin")) for d in dominante])
+    quadril = np.array([d == "root" for d in dominante]) & (pos[:, 1] < CINTURA_Y)
+    return perna | quadril
+
+
 def roupa():
     """Refaz o atlas da roupa a partir do original.
 
@@ -130,12 +142,31 @@ def roupa():
     d = ImageDraw.Draw(cobertura)
     for tri in indices[com_area & ~e_mao]:
         d.polygon([(float(uv[v, 0]) * largura, float(uv[v, 1]) * altura) for v in tri], fill=255)
+    interior = np.asarray(cobertura.filter(ImageFilter.MinFilter(25))) > 0
     cobertura = np.asarray(cobertura.filter(ImageFilter.MaxFilter(5))) > 0
-    ruim = cobertura & (_fundo(o) | _pele(o))
+    # Pele com sombra (maos da folha) so e procurada perto da borda dos recortes
+    # e fora deles: no interior ela se confunde com o bege do peixe do logo.
+    pele_ampla = (o[..., 0] > 85) & (o[..., 0] > o[..., 2] + 30) & (o[..., 1] > o[..., 2] + 6) & (o[..., 0] - o[..., 1] < 85)
+    estranho = _fundo(o) | _pele(o) | (pele_ampla & ~interior)
+    ruim = cobertura & estranho
+    # Faces laterais (tronco, quadril) ficam espremidas em uma coluna de poucos
+    # pixels na borda do desenho, onde ha fundo, mao e sombra. Essa coluna e
+    # refeita a partir da roupa vizinha.
+    tri3 = pos[indices]
+    area3 = np.linalg.norm(np.cross(tri3[:, 1] - tri3[:, 0], tri3[:, 2] - tri3[:, 0]), axis=1) / 2
+    px = uv[indices] * [largura, altura]
+    area2 = np.abs((px[:, 1, 0] - px[:, 0, 0]) * (px[:, 2, 1] - px[:, 0, 1]) - (px[:, 1, 1] - px[:, 0, 1]) * (px[:, 2, 0] - px[:, 0, 0])) / 2
+    densidade = area2 / np.maximum(area3, 1e-12)
+    esticado = com_area & ~e_mao & (densidade < 0.4 * np.median(densidade[com_area]))
+    faixa = Image.new("L", (largura, altura), 0)
+    d = ImageDraw.Draw(faixa)
+    for tri in indices[esticado]:
+        d.polygon([(float(uv[v, 0]) * largura, float(uv[v, 1]) * altura) for v in tri], fill=255, outline=255)
+    ruim |= cobertura & (np.asarray(faixa.filter(ImageFilter.MaxFilter(5))) > 0)
     # Margem de 1 pixel: a borda do fundo vem misturada com a roupa.
     ruim = np.asarray(Image.fromarray((ruim * 255).astype("uint8")).filter(ImageFilter.MaxFilter(3))) > 0
     ruim &= cobertura
-    limpo = _preencher(o, ruim | (~cobertura & (_fundo(o) | _pele(o))))
+    limpo = _preencher(o, ruim | (~cobertura & estranho))
     limpo = np.where(cobertura[..., None], limpo, o).astype(int)
 
     # Capuz por tras: a area amostrada era a sombra sob o capuz, quase preta.
@@ -156,6 +187,12 @@ def roupa():
     dados = _amostras()
     celula = dados["celula_px"]
     cor_padrao = np.median(limpo[cobertura], axis=0)
+    calca_v = _vertices_da_calca(pos, dominante)
+    cobertura_calca = Image.new("L", (largura, altura), 0)
+    d = ImageDraw.Draw(cobertura_calca)
+    for tri in indices[com_area & (calca_v[indices].sum(1) >= 2)]:
+        d.polygon([(float(uv[v, 0]) * largura, float(uv[v, 1]) * altura) for v in tri], fill=255)
+    cor_calca = np.median(limpo[np.asarray(cobertura_calca) > 0], axis=0)
     for amostra in dados["amostras"]:
         e_pele = mao[amostra["vertices"]].mean() > 0.5
         pontos = []
@@ -165,8 +202,17 @@ def roupa():
             ys = np.clip(np.linspace(ay, by, n).round().astype(int), 0, altura - 1)
             pontos.append(o[ys, xs])
         pontos = np.concatenate(pontos)
-        validos = pontos[_pele(pontos)] if e_pele else pontos[~_fundo(pontos) & ~_pele(pontos)]
-        cor = np.median(validos, axis=0) if len(validos) else (np.median(pontos, axis=0) if e_pele else cor_padrao)
+        if e_pele:
+            validos = pontos[_pele(pontos)]
+            cor = np.median(validos if len(validos) else pontos, axis=0)
+        else:
+            # Tolerancia maior aqui: a borda do fundo vem misturada e parece cinza.
+            quase_fundo = pontos[:, 2] - pontos[:, 0] >= 0
+            validos = pontos[~quase_fundo & ~_pele(pontos)]
+            # Com poucos pixels de roupa na linha, a mediana nao e confiavel.
+            e_calca = calca_v[amostra["vertices"]].mean() > 0.5
+            reserva = cor_calca if e_calca else cor_padrao
+            cor = np.median(validos, axis=0) if len(validos) >= 0.6 * len(pontos) else reserva
         cx, cy = amostra["centro_px"]
         x0, y0 = int(cx - celula / 2), int(cy - celula / 2)
         limpo[y0:y0 + celula, x0:x0 + celula] = cor
@@ -254,9 +300,7 @@ def cabelo():
 def calca():
     """Rasteriza no espaco UV os triangulos do corpo que pertencem a calca."""
     pos, uv, indices, dominante = _glb()
-    perna = np.array([d.startswith(("thigh", "shin")) for d in dominante])
-    quadril = np.array([d == "root" for d in dominante]) & (pos[:, 1] < CINTURA_Y)
-    calca_v = perna | quadril
+    calca_v = _vertices_da_calca(pos, dominante)
     largura, altura = 768, 896
     mascara = Image.new("L", (largura, altura), 0)
     d = ImageDraw.Draw(mascara)

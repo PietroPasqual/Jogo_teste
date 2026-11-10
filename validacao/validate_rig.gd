@@ -181,7 +181,33 @@ func validate() -> void:
 	check(overrides.get("Lentes fumê", false), "lentes sem o ajuste de cor")
 	check(cloth_imported, "textura ajustada da roupa nao veio de um recurso importado (falharia no jogo exportado)")
 
+	# 5: mapa de ossos humanoide (retargeting).
+	var bone_map := load("res://pescador_v29/pescador_bone_map.tres") as BoneMap
+	check(bone_map != null and bone_map.profile != null, "pescador_bone_map.tres nao carregou")
+	var mapped := 0
+	var unmapped: Array[String] = []
+	if bone_map != null and bone_map.profile != null:
+		var profile := bone_map.profile
+		for i in range(profile.bone_size):
+			var profile_bone := profile.get_bone_name(i)
+			var bone_name := bone_map.get_skeleton_bone_name(profile_bone)
+			if bone_name == &"":
+				unmapped.append(String(profile_bone))
+				continue
+			mapped += 1
+			check(skeleton.find_bone(bone_name) >= 0, "mapa de ossos aponta para osso inexistente: %s -> %s" % [profile_bone, bone_name])
+		# Lados: a mao esquerda do perfil precisa cair no lado +X do modelo.
+		var left_hand := skeleton.find_bone(bone_map.get_skeleton_bone_name("LeftHand"))
+		var right_hand := skeleton.find_bone(bone_map.get_skeleton_bone_name("RightHand"))
+		if left_hand >= 0 and right_hand >= 0:
+			check(skeleton.get_bone_global_rest(left_hand).origin.x > 0.0 and skeleton.get_bone_global_rest(right_hand).origin.x < 0.0, "mapa de ossos com os lados trocados")
+	# Sem osso proprio no modelo: olhos e mandibula.
+	check(unmapped.size() <= 3, "ossos do perfil humanoide sem mapeamento: %s" % ", ".join(unmapped))
+	print("MAPA_DE_OSSOS mapeados=", mapped, " sem_mapeamento=", unmapped)
+
 	finish({
+		"bone_map_mapped": mapped,
+		"bone_map_unmapped": unmapped,
 		"engine": Engine.get_version_info()["string"],
 		"bones": skeleton.get_bone_count(),
 		"poses": rows,

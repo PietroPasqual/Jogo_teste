@@ -8,7 +8,7 @@ executadas, e os relatórios estão em `validacao/`.
 | Verificação | Resultado | Relatório |
 |---|---|---|
 | Malha do `.glb` (geometria, pesos, UVs, animações, texturas) | Passou, sem erros nem avisos | `validation_report_glb.json` |
-| Rig no motor (68 ossos, poses, seções do ombro, 6 animações) | Passou | `validation_report_godot_4_4_1.json` |
+| Rig no motor (68 ossos, poses, seções do ombro, 6 animações, mapa de ossos) | Passou | `validation_report_godot_4_4_1.json` |
 | Cores contra a folha de referência (6 regiões) | Todas dentro da tolerância | `color_report.json` |
 | Demo (`project.godot`) | Abre e roda sem erros | — |
 
@@ -87,6 +87,25 @@ Os atlas originais continuam no repositório. Tudo é gerado por
 **Limite que continua:** a resolução. O corpo inteiro ocupa cerca de 285 pixels de largura por
 vista no atlas (uns 425 pixels por metro), então de perto o camuflado fica suave. Melhorar isso
 exige pintar um atlas novo em resolução maior, não só tratar o existente.
+
+## Articulações e animações
+
+`validacao/teste_articulacoes.gd` aplica 12 poses fortes direto nos ossos (cotovelos a 110°,
+agachamento, braços à frente e acima, arremesso, passo largo, tronco inclinado e torcido, cabeça,
+punhos, torção de punho e de tornozelo) e renderiza cada uma em dois ângulos
+(`validacao/imagens/articulacoes/`).
+
+- **Resultado:** cotovelos, joelhos, ombros, quadril, tronco, pescoço, punhos e tornozelos
+  dobram sem quebras, buracos nem vértices soltos. Os pesos se misturam numa faixa de cerca de
+  6 cm em torno de cada junta, sem cortes duros. Os pesos e os ossos do `.glb` não foram alterados.
+- **Defeito encontrado e corrigido:** com o braço fora do lugar, aparecia uma placa cinza com um
+  triângulo cor de pele na lateral do tronco e do quadril. Não era da malha: essas faces laterais
+  amostram uma coluna de poucos pixels na borda do desenho, onde a folha tem fundo e mão. O atlas
+  ajustado agora refaz essas colunas com a cor da roupa.
+- **Mapa de ossos humanoide:** `pescador_v29/pescador_bone_map.tres` mapeia 53 ossos para o perfil
+  humanoide do Godot, para reaproveitar animações de outras bibliotecas. O validador confere que
+  cada osso mapeado existe e que os lados não estão trocados. O mapa não foi testado com uma
+  biblioteca de animações externa.
 
 ## Diferenças que continuam
 
