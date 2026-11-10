@@ -15,7 +15,7 @@ Use sempre a cena `PescadorCorrigido.tscn`, não o `.glb` direto. É ela que apl
 
 | Animação | Uso |
 |---|---|
-| `Idle_Referencia` | Repouso com as mãos semifechadas, como na folha de referência. Criada pela cena ao carregar. |
+| `Idle_Referencia` | Repouso da folha de referência: punhos soltos, palmas viradas para as coxas, braços junto do tronco. Criada pela cena ao carregar. |
 | `Idle` | Repouso original, com as mãos abertas. |
 | `Grip_Rod` | Fecha as mãos para segurar a vara. |
 | `Rig_Mobility`, `Shoulder_Abduction`, `Shoulder_Stress` | Testes de movimento do rig. |
@@ -29,9 +29,10 @@ modelo: o retarget muda a pose de repouso, e o corretivo de ombro foi calculado 
 
 ## O que a cena ajusta
 
-No `pescador_v29.glb`, só o UV de alguns triângulos da roupa foi corrigido. A malha, o rig e as
-animações são os originais da V29. Os demais ajustes são aplicados por `pescador_scene.gd`
-quando a cena carrega:
+O `pescador_v29.glb` foi remodelado em relação à V29 original: mãos novas em blocos facetados,
+mangas mais cheias, tênis mais encorpados, aba do chapéu reta e capuz mais alto. O esqueleto e
+as animações são os originais. Os demais ajustes são aplicados por `pescador_scene.gd` quando a
+cena carrega:
 
 - **Cabelo cacheado** (`hair_curls.gd`): touca de cabelo presa ao osso da cabeça.
 - **Ombros** (`shoulder_corrective.gd`): corretivo automático, sem a ombreira saliente.
@@ -39,7 +40,7 @@ quando a cena carrega:
 - **Capuz por trás** (`pescador_v29_Rosto_ajustado.png`): camuflado no lugar do borrão escuro.
 - **Calça cargo escura** (`pants_darken.gdshader` + `pants_mask.png`).
 - **Lentes escuras** dos óculos.
-- **Mãos semifechadas** na animação `Idle_Referencia`.
+- **Pose da referência** na animação `Idle_Referencia`.
 
 ## Demo
 
@@ -57,9 +58,11 @@ godot --path . -s validacao/validate_rig.gd               # rig no motor
 godot --path . -s validacao/render_views.gd               # vistas da referência
 godot --path . -s validacao/render_poses.gd               # poses das animações
 godot --path . -s validacao/teste_articulacoes.gd         # teste de esforço das articulações
+godot --path . -s validacao/render_silhueta.gd            # silhuetas em projeção ortográfica
+python3 validacao/ferramentas/comparar_silhueta.py CAMINHO/folha_de_referencia.png
 python3 validacao/ferramentas/comparar_referencia.py CAMINHO/folha_de_referencia.png
 ```
 
 As texturas ajustadas são geradas por `python3 validacao/ferramentas/gerar_texturas.py`
-(requer Pillow e NumPy). A correção de UV do `.glb` é feita uma vez por
-`python3 validacao/ferramentas/corrigir_uv_glb.py`.
+(requer Pillow e NumPy). As alterações no `.glb` foram feitas, nesta ordem, por `corrigir_uv_glb.py`,
+`remodelar_maos.py` e `remodelar_corpo.py` (todos em `validacao/ferramentas/`).

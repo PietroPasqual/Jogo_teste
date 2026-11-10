@@ -1,0 +1,173 @@
+{
+  "frente": {
+    "copa_do_chapeu": {
+      "referencia": 0.1056,
+      "modelo": 0.0967,
+      "razao": 0.916
+    },
+    "aba_do_chapeu": {
+      "referencia": 0.1889,
+      "modelo": 0.1833,
+      "razao": 0.97
+    },
+    "rosto": {
+      "referencia": 0.1133,
+      "modelo": 0.1022,
+      "razao": 0.902
+    },
+    "ombros": {
+      "referencia": 0.2856,
+      "modelo": 0.2978,
+      "razao": 1.043
+    },
+    "peito": {
+      "referencia": 0.3122,
+      "modelo": 0.3311,
+      "razao": 1.061
+    },
+    "cintura": {
+      "referencia": 0.34,
+      "modelo": 0.3522,
+      "razao": 1.036
+    },
+    "maos": {
+      "referencia": 0.31,
+      "modelo": 0.2544,
+      "razao": 0.821
+    },
+    "coxas": {
+      "referencia": 0.2489,
+      "modelo": 0.2522,
+      "razao": 1.013
+    },
+    "joelhos": {
+      "referencia": 0.2611,
+      "modelo": 0.2711,
+      "razao": 1.038
+    },
+    "canelas": {
+      "referencia": 0.3033,
+      "modelo": 0.3,
+      "razao": 0.989
+    },
+    "pes": {
+      "referencia": 0.3511,
+      "modelo": 0.3633,
+      "razao": 1.035
+    }
+  },
+  "lado": {
+    "copa_do_chapeu": {
+      "referencia": 0.1089,
+      "modelo": 0.1122,
+      "razao": 1.03
+    },
+    "aba_do_chapeu": {
+      "referencia": 0.1856,
+      "modelo": 0.15,
+      "razao": 0.808
+    },
+    "rosto": {
+      "referencia": 0.1078,
+      "modelo": 0.1022,
+      "razao": 0.948
+    },
+    "ombros": {
+      "referencia": 0.1422,
+      "modelo": 0.17,
+      "razao": 1.195
+    },
+    "peito": {
+      "referencia": 0.1533,
+      "modelo": 0.1656,
+      "razao": 1.08
+    },
+    "cintura": {
+      "referencia": 0.1233,
+      "modelo": 0.1267,
+      "razao": 1.028
+    },
+    "maos": {
+      "referencia": 0.1111,
+      "modelo": 0.1233,
+      "razao": 1.11
+    },
+    "coxas": {
+      "referencia": 0.1111,
+      "modelo": 0.1133,
+      "razao": 1.02
+    },
+    "joelhos": {
+      "referencia": 0.1078,
+      "modelo": 0.1044,
+      "razao": 0.968
+    },
+    "canelas": {
+      "referencia": 0.1122,
+      "modelo": 0.1044,
+      "razao": 0.93
+    },
+    "pes": {
+      "referencia": 0.1811,
+      "modelo": 0.1833,
+      "razao": 1.012
+    }
+  },
+  "costas": {
+    "copa_do_chapeu": {
+      "referencia": 0.1044,
+      "modelo": 0.0967,
+      "razao": 0.926
+    },
+    "aba_do_chapeu": {
+      "referencia": 0.1878,
+      "modelo": 0.1833,
+      "razao": 0.976
+    },
+    "rosto": {
+      "referencia": 0.1089,
+      "modelo": 0.1022,
+      "razao": 0.938
+    },
+    "ombros": {
+      "referencia": 0.2667,
+      "modelo": 0.2978,
+      "razao": 1.117
+    },
+    "peito": {
+      "referencia": 0.2911,
+      "modelo": 0.3311,
+      "razao": 1.137
+    },
+    "cintura": {
+      "referencia": 0.3022,
+      "modelo": 0.3522,
+      "razao": 1.165
+    },
+    "maos": {
+      "referencia": 0.2222,
+      "modelo": 0.2544,
+      "razao": 1.145
+    },
+    "coxas": {
+      "referencia": 0.2178,
+      "modelo": 0.2522,
+      "razao": 1.158
+    },
+    "joelhos": {
+      "referencia": 0.2178,
+      "modelo": 0.2711,
+      "razao": 1.245
+    },
+    "canelas": {
+      "referencia": 0.2467,
+      "modelo": 0.3,
+      "razao": 1.216
+    },
+    "pes": {
+      "referencia": 0.2844,
+      "modelo": 0.3633,
+      "razao": 1.277
+    }
+  }
+}

@@ -20,11 +20,11 @@
       70
     ],
     "render_rgb": [
-      173,
-      109,
-      76
+      169,
+      106,
+      74
     ],
-    "diferenca_maxima": 11,
+    "diferenca_maxima": 8,
     "dentro_da_tolerancia": true
   },
   "cabelo": {
@@ -76,11 +76,11 @@
       34
     ],
     "render_rgb": [
-      150,
+      149,
       28,
       35
     ],
-    "diferenca_maxima": 10,
+    "diferenca_maxima": 9,
     "dentro_da_tolerancia": true
   },
   "tolerancia_por_canal": 22,

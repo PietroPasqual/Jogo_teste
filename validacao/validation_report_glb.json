@@ -1,6 +1,6 @@
 {
   "arquivo": "pescador_v29/pescador_v29.glb",
-  "bytes": 5613024,
+  "bytes": 5365356,
   "ossos": 68,
   "primitivas": [
     {
@@ -10,14 +10,14 @@
       "triangulos": 4621,
       "triangulos_degenerados": 0,
       "caixa_min": [
-        -0.3503,
+        -0.3614,
         0.0,
         -0.1688
       ],
       "caixa_max": [
-        0.3459,
+        0.3564,
         1.5309,
-        0.1785
+        0.202
       ],
       "normais_fora_de_unidade": 0,
       "uv_fora_de_0_1": 0,
@@ -31,14 +31,14 @@
       "triangulos": 11538,
       "triangulos_degenerados": 0,
       "caixa_min": [
-        -0.1696,
+        -0.174,
         1.4164,
         -0.1957
       ],
       "caixa_max": [
-        0.178,
+        0.1825,
         1.8858,
-        0.2084
+        0.1897
       ],
       "normais_fora_de_unidade": 0,
       "uv_fora_de_0_1": 0,
@@ -69,18 +69,18 @@
     {
       "primitiva": 3,
       "material": "Pescador",
-      "vertices": 6948,
-      "triangulos": 2316,
+      "vertices": 2624,
+      "triangulos": 1360,
       "triangulos_degenerados": 0,
       "caixa_min": [
-        -0.3164,
-        0.809,
-        -0.0064
+        -0.3178,
+        0.8025,
+        -0.0098
       ],
       "caixa_max": [
-        0.3164,
-        0.9514,
-        0.0376
+        0.3178,
+        0.9622,
+        0.039
       ],
       "normais_fora_de_unidade": 0,
       "uv_fora_de_0_1": 0,
@@ -94,14 +94,14 @@
       "triangulos": 369,
       "triangulos_degenerados": 0,
       "caixa_min": [
-        -0.3503,
+        -0.3614,
         0.0,
         -0.1688
       ],
       "caixa_max": [
-        0.3459,
+        0.3564,
         1.5309,
-        0.1785
+        0.202
       ],
       "normais_fora_de_unidade": 0,
       "uv_fora_de_0_1": 0,
@@ -110,7 +110,7 @@
     }
   ],
   "altura_m": 1.8858,
-  "assimetria_x_m": 0.0044,
+  "assimetria_x_m": 0.005,
   "animacoes": [
     {
       "nome": "Idle",

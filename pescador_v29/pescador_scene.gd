@@ -19,8 +19,14 @@ const PANTS_MASK_FILE := "pants_mask.png"
 const LENS_COLOR := Color(0.075, 0.06, 0.065)
 ## Repouso da referencia: Idle com os dedos parcialmente fechados.
 const REFERENCE_IDLE := "Idle_Referencia"
-const FINGER_CURL := 0.6
+const FINGER_CURL := 0.85
 const GRIP_SAMPLE := 0.75
+## Na referencia a palma fica virada para a coxa. No repouso do rig ela fica
+## virada para tras: o giro abaixo, em graus, e dividido entre antebraco e mao.
+const FOREARM_TWIST_DEGREES := 35.0
+const HAND_TWIST_DEGREES := 50.0
+## Bracos um pouco mais junto do tronco, como na referencia.
+const ARM_IN_DEGREES := 2.5
 
 var _cloth_texture: Texture2D = null
 var _head_texture: Texture2D = null
@@ -124,8 +130,47 @@ func _add_reference_idle() -> void:
         for key in range(pose.track_get_key_count(track)):
             var open: Quaternion = pose.track_get_key_value(track, key)
             pose.track_set_key_value(track, key, open.slerp(closed, FINGER_CURL))
+    for side in ["R", "L"]:
+        var direction := 1.0 if side == "R" else -1.0
+        _rotate_bone(pose, "upper_arm." + side, Vector3.BACK, direction * ARM_IN_DEGREES)
+        _twist_bone(pose, "forearm_twist." + side, "hand." + side, direction * FOREARM_TWIST_DEGREES)
+        _twist_bone(pose, "hand." + side, "finger_middle_01." + side, direction * HAND_TWIST_DEGREES)
     for library_name in _player.get_animation_library_list():
         var library: AnimationLibrary = _player.get_animation_library(library_name)
         if library.has_animation("Idle"):
             library.add_animation(REFERENCE_IDLE, pose)
             return
+
+## Gira `bone_name` em torno do proprio eixo (a direcao ate `child_name`).
+func _twist_bone(pose: Animation, bone_name: String, child_name: String, degrees: float) -> void:
+    var child: int = _skeleton.find_bone(child_name)
+    if child < 0:
+        return
+    _rotate_bone(pose, bone_name, _skeleton.get_bone_rest(child).origin.normalized(), degrees)
+
+## Soma uma rotacao a `bone_name` em todas as chaves da animacao. Cria a trilha
+## se a animacao nao tiver uma.
+func _rotate_bone(pose: Animation, bone_name: String, axis: Vector3, degrees: float) -> void:
+    var bone: int = _skeleton.find_bone(bone_name)
+    if bone < 0:
+        return
+    var extra := Quaternion(axis, deg_to_rad(degrees))
+    # Usa o mesmo caminho de no das trilhas que a animacao ja tem.
+    var prefix := ""
+    for existing in range(pose.get_track_count()):
+        if pose.track_get_type(existing) == Animation.TYPE_ROTATION_3D:
+            prefix = String(pose.track_get_path(existing).get_concatenated_names())
+            break
+    if prefix == "":
+        return
+    var path := NodePath(prefix + ":" + bone_name)
+    var track: int = pose.find_track(path, Animation.TYPE_ROTATION_3D)
+    if track < 0:
+        track = pose.add_track(Animation.TYPE_ROTATION_3D)
+        pose.track_set_path(track, path)
+        var rest: Quaternion = _skeleton.get_bone_rest(bone).basis.get_rotation_quaternion()
+        pose.rotation_track_insert_key(track, 0.0, rest * extra)
+        return
+    for key in range(pose.track_get_key_count(track)):
+        var value: Quaternion = pose.track_get_key_value(track, key)
+        pose.track_set_key_value(track, key, value * extra)

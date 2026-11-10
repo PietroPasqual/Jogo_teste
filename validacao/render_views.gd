@@ -53,6 +53,14 @@ func run() -> void:
 	var cam := Camera3D.new()
 	root.add_child(cam)
 
+	# Pose da folha de referencia (maos em punho solto, palma para a coxa).
+	await process_frame
+	var player := _find_player(model)
+	if player != null and player.has_animation("Idle_Referencia"):
+		player.play("Idle_Referencia")
+		player.seek(0.0, true)
+		player.pause()
+
 	for view in VIEWS:
 		var yaw := deg_to_rad(view["yaw"])
 		var target: Vector3 = view["target"]
@@ -68,3 +76,12 @@ func run() -> void:
 		img.save_png("res://validacao/imagens/renders/render_" + view["name"] + ".png")
 		print("RENDERED ", view["name"])
 	quit()
+
+func _find_player(node: Node) -> AnimationPlayer:
+	if node is AnimationPlayer:
+		return node
+	for child in node.get_children():
+		var found := _find_player(child)
+		if found != null:
+			return found
+	return null

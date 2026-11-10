@@ -7,10 +7,10 @@ extends Node
 const COLS := 44
 const ROWS := 14
 const CENTER := Vector3(0.0, 0.1, -0.012)
-const RADII := Vector3(0.1, 0.1, 0.106)
+const RADII := Vector3(0.106, 0.1, 0.108)
 ## Alargamento da metade inferior, para a massa de cabelo da referencia
 ## aparecer dos lados do rosto e na nuca.
-const LOWER_FLARE := 0.2
+const LOWER_FLARE := 0.27
 const PHI_TOP := 0.32
 const PHI_BOTTOM := 2.12
 const TILES_AROUND := 2.0
