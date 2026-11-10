@@ -45,7 +45,7 @@
   "material_overrides": {
     "Lentes fumê": true,
     "Pescador": true,
-    "Rosto e acessórios": false,
+    "Rosto e acessórios": true,
     "ShoulderCloth": true
   },
   "max_position_error_m": 0.000000181295405354831,

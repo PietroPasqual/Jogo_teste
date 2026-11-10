@@ -20,14 +20,16 @@ Use sempre a cena `PescadorCorrigido.tscn`, não o `.glb` direto. É ela que apl
 | `Grip_Rod` | Fecha as mãos para segurar a vara. |
 | `Rig_Mobility`, `Shoulder_Abduction`, `Shoulder_Stress` | Testes de movimento do rig. |
 
-## O que a cena ajusta (sem alterar o `.glb`)
+## O que a cena ajusta
 
-O arquivo `pescador_v29.glb` é o original da V29, byte a byte. Todos os ajustes são aplicados
-por `pescador_scene.gd` quando a cena carrega:
+No `pescador_v29.glb`, só o UV de alguns triângulos da roupa foi corrigido. A malha, o rig e as
+animações são os originais da V29. Os demais ajustes são aplicados por `pescador_scene.gd`
+quando a cena carrega:
 
 - **Cabelo cacheado** (`hair_curls.gd`): touca de cabelo presa ao osso da cabeça.
 - **Ombros** (`shoulder_corrective.gd`): corretivo automático, sem a ombreira saliente.
-- **Camuflado** (`pescador_v29_Roupa_ajustada.png`): mais contraste e nitidez.
+- **Roupa** (`pescador_v29_Roupa_ajustada.png`): atlas refeito, sem riscos nem fundo, com mais contraste.
+- **Capuz por trás** (`pescador_v29_Rosto_ajustado.png`): camuflado no lugar do borrão escuro.
 - **Calça cargo escura** (`pants_darken.gdshader` + `pants_mask.png`).
 - **Lentes escuras** dos óculos.
 - **Mãos semifechadas** na animação `Idle_Referencia`.
@@ -50,5 +52,6 @@ godot --path . -s validacao/render_poses.gd               # poses das animaçõe
 python3 validacao/ferramentas/comparar_referencia.py CAMINHO/folha_de_referencia.png
 ```
 
-As texturas auxiliares são geradas por `python3 validacao/ferramentas/gerar_texturas.py`
-(requer Pillow e NumPy).
+As texturas ajustadas são geradas por `python3 validacao/ferramentas/gerar_texturas.py`
+(requer Pillow e NumPy). A correção de UV do `.glb` é feita uma vez por
+`python3 validacao/ferramentas/corrigir_uv_glb.py`.

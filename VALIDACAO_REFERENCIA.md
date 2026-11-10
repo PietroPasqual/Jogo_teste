@@ -18,7 +18,7 @@ executadas, e os relatórios estão em `validacao/`.
 - Normais unitárias, UVs dentro de 0..1, pesos somando 1 em todos os vértices, nenhum vértice sem peso.
 - 68 ossos, 5 animações com tempos em ordem e rotações unitárias, 2 texturas embutidas íntegras.
 - Altura do personagem: 1,886 m, com os pés em y = 0.
-- O `.glb` não foi alterado: é o arquivo original da V29.
+- No `.glb`, só o UV de 1.336 vértices da roupa foi alterado (ver "Textura refeita"). Posições, normais, pesos, ossos, animações e o tamanho do arquivo são idênticos ao original da V29.
 
 ### Rig no motor
 
@@ -66,6 +66,27 @@ problemas que as etapas anteriores não tinham pegado:
 O volume do ombro também foi a única mudança que afeta os dados do autor: os 6 ossos auxiliares
 `shoulder_deform_*` ficam 5,46 cm mais para dentro do que em `validacao/expected.json`. Isso é
 intencional, e o validador reporta esse valor à parte.
+
+## Textura refeita
+
+A textura da roupa é a própria folha de referência projetada sobre o corpo, e o mapa UV não
+acompanha a silhueta do desenho. Isso causava três defeitos, agora corrigidos:
+
+1. **Riscos em topos de ombro, barras, laterais de bolso e solas.** 554 triângulos tinham os três
+   vértices sobre uma mesma linha do atlas, então apareciam como borrões riscados.
+   `corrigir_uv_glb.py` aponta cada grupo para uma amostra de cor sólida própria (384 amostras,
+   em uma área livre do atlas). É a única mudança no `.glb`.
+2. **Roupa amostrando o fundo e a pele da folha.** O atlas ajustado troca esses pixels pela cor
+   da roupa vizinha.
+3. **Capuz por trás escuro e com manchas esverdeadas.** A faixa correspondente do atlas `Rosto`
+   foi repintada com o camuflado do próprio capuz (`pescador_v29_Rosto_ajustado.png`).
+
+Os atlas originais continuam no repositório. Tudo é gerado por
+`validacao/ferramentas/gerar_texturas.py`.
+
+**Limite que continua:** a resolução. O corpo inteiro ocupa cerca de 285 pixels de largura por
+vista no atlas (uns 425 pixels por metro), então de perto o camuflado fica suave. Melhorar isso
+exige pintar um atlas novo em resolução maior, não só tratar o existente.
 
 ## Diferenças que continuam
 

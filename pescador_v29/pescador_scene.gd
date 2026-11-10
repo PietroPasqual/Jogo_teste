@@ -12,6 +12,7 @@ const HairCurls = preload("hair_curls.gd")
 ## Arquivos na mesma pasta deste script. Sao carregados como recursos importados,
 ## para funcionar tambem no jogo exportado.
 const CLOTH_TEXTURE_FILE := "pescador_v29_Roupa_ajustada.png"
+const HEAD_TEXTURE_FILE := "pescador_v29_Rosto_ajustado.png"
 const HAIR_TEXTURE_FILE := "hair_curls_albedo.png"
 const PANTS_MASK_FILE := "pants_mask.png"
 ## Tom das lentes medido na referencia.
@@ -22,6 +23,7 @@ const FINGER_CURL := 0.6
 const GRIP_SAMPLE := 0.75
 
 var _cloth_texture: Texture2D = null
+var _head_texture: Texture2D = null
 var _hair_texture: Texture2D = null
 var _pants_mask: Texture2D = null
 var _skeleton: Skeleton3D = null
@@ -30,6 +32,7 @@ var _player: AnimationPlayer = null
 func _ready() -> void:
     var base_dir: String = (get_script() as Script).resource_path.get_base_dir()
     _cloth_texture = _load_texture(base_dir.path_join(CLOTH_TEXTURE_FILE))
+    _head_texture = _load_texture(base_dir.path_join(HEAD_TEXTURE_FILE))
     _hair_texture = _load_texture(base_dir.path_join(HAIR_TEXTURE_FILE))
     _pants_mask = _load_texture(base_dir.path_join(PANTS_MASK_FILE))
     _configure(self)
@@ -68,6 +71,10 @@ func _configure(node: Node) -> void:
                 lens.roughness = 0.12
                 lens.metallic_specular = 0.8
                 node.set_surface_override_material(surface, lens)
+            elif original.resource_name == "Rosto e acessórios" and _head_texture != null:
+                var head := original.duplicate() as StandardMaterial3D
+                head.albedo_texture = _head_texture
+                node.set_surface_override_material(surface, head)
             elif original.resource_name == "Pescador":
                 var body := ShaderMaterial.new()
                 body.shader = PantsShader

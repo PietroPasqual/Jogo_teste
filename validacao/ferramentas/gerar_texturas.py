@@ -2,8 +2,11 @@
 
 Uso: python3 validacao/ferramentas/gerar_texturas.py  (a partir da raiz do repositorio)
 
-- pescador_v29_Roupa_ajustada.png: contraste e nitidez do camuflado, preservando
-  os tons de pele originais (as maos usam um unico texel de pele deste atlas).
+- pescador_v29_Roupa_ajustada.png: atlas da roupa refeito a partir do original:
+  sem o fundo e a pele que a roupa amostrava por engano, com as amostras de cor
+  solida de uv_amostras.json, e com contraste e nitidez ajustados.
+- pescador_v29_Rosto_ajustado.png: atlas da cabeca com a parte de tras do capuz
+  repintada com camuflado.
 - hair_curls_albedo.png: tufos recortados de cabelo, nos tons medidos na referencia.
 - pants_mask.png: mascara da calca no espaco UV do atlas Roupa, calculada na pose
   de repouso pelos pesos dos ossos das pernas. Nao depende da animacao.
@@ -17,19 +20,197 @@ import numpy as np
 from PIL import Image, ImageDraw, ImageEnhance, ImageFilter
 
 PASTA = "pescador_v29/"
+AMOSTRAS = "validacao/ferramentas/uv_amostras.json"
+# Caixas em pixels do atlas Roupa (x0, y0, x1, y1).
+CAPUZ_ORIGEM = (720, 1248, 960, 1322)   # camuflado do capuz no close-up de costas
+CAPUZ_ORIGEM_GRANDE = (700, 1238, 1000, 1330)
+CAPUZ_DESTINO = (752, 198, 910, 254)    # area que o capuz amostra na vista de costas
+
+
+def _abrir_glb():
+    """Abre o .glb e devolve o JSON e uma funcao que le um acessor."""
+    with open(PASTA + "pescador_v29.glb", "rb") as f:
+        f.read(12)
+        n, _ = struct.unpack("<II", f.read(8))
+        gltf = json.loads(f.read(n))
+        n, _ = struct.unpack("<II", f.read(8))
+        binario = f.read(n)
+    comp = {"SCALAR": 1, "VEC2": 2, "VEC3": 3, "VEC4": 4}
+    tipos = {5121: "u1", 5123: "u2", 5125: "u4", 5126: "f4"}
+
+    def acessor(i):
+        a = gltf["accessors"][i]
+        bv = gltf["bufferViews"][a["bufferView"]]
+        k = comp[a["type"]]
+        dt = np.dtype(tipos[a["componentType"]])
+        inicio = bv.get("byteOffset", 0) + a.get("byteOffset", 0)
+        passo = bv.get("byteStride", k * dt.itemsize)
+        bruto = np.frombuffer(binario, dtype=np.uint8, count=(a["count"] - 1) * passo + k * dt.itemsize, offset=inicio)
+        linhas = np.lib.stride_tricks.as_strided(bruto, shape=(a["count"], k * dt.itemsize), strides=(passo, 1))
+        return np.ascontiguousarray(linhas).view(dt).reshape(a["count"], k)
+
+    return gltf, acessor
+
+
+def _glb():
+    """Le do .glb os dados do corpo: posicoes, UVs, triangulos e osso dominante."""
+    gltf, acessor = _abrir_glb()
+    prims = gltf["meshes"][0]["primitives"]
+    corpo = prims[0]
+    pos = acessor(corpo["attributes"]["POSITION"]).astype(float)
+    uv = acessor(corpo["attributes"]["TEXCOORD_0"]).astype(float)
+    juntas = acessor(corpo["attributes"]["JOINTS_0"]).astype(int)
+    pesos = acessor(corpo["attributes"]["WEIGHTS_0"]).astype(float)
+    nomes = [gltf["nodes"][j]["name"] for j in gltf["skins"][0]["joints"]]
+    dominante = np.array([nomes[juntas[i, pesos[i].argmax()]] for i in range(len(pos))])
+    # Corpo (0) e tecido do ombro (4) usam os mesmos vertices.
+    indices = np.concatenate([acessor(prims[i]["indices"]).ravel().reshape(-1, 3) for i in (0, 4)]).astype(int)
+    return pos, uv, indices, dominante
+
+
+def _triangulos_com_area(uv, indices, largura, altura):
+    px = uv[indices] * [largura, altura]
+    area = np.abs((px[:, 1, 0] - px[:, 0, 0]) * (px[:, 2, 1] - px[:, 0, 1]) - (px[:, 1, 1] - px[:, 0, 1]) * (px[:, 2, 0] - px[:, 0, 0])) / 2
+    return area >= 0.5
+
+
+def _amostras():
+    with open(AMOSTRAS, encoding="utf-8") as f:
+        return json.load(f)
+
+
+def _fundo(p):
+    """Fundo cinza-azulado da folha de referencia."""
+    return (p[..., 2] - p[..., 0] >= 4) & (p[..., 1] >= p[..., 0] - 2)
+
+
+def _pele(p):
+    # Limiares apertados: o peixe do logo e bege claro e nao pode entrar aqui.
+    return (p[..., 0] > 110) & (p[..., 0] > p[..., 2] + 70) & (p[..., 1] > p[..., 2] + 20)
+
+
+def _preencher(imagem, ruim, passos=80):
+    """Troca os pixels ruins pela media dos vizinhos bons, de fora para dentro."""
+    img = imagem.astype(float)
+    bom = ~ruim
+    for _ in range(passos):
+        if bom.all():
+            break
+        soma = np.zeros_like(img)
+        conta = np.zeros(bom.shape)
+        for dy, dx in ((0, 1), (0, -1), (1, 0), (-1, 0)):
+            b = np.roll(bom, (dy, dx), (0, 1))
+            soma += np.roll(img, (dy, dx), (0, 1)) * b[..., None]
+            conta += b
+        novos = ~bom & (conta > 0)
+        img[novos] = soma[novos] / conta[novos][:, None]
+        bom = bom | novos
+    return img
 
 
 def roupa():
+    """Refaz o atlas da roupa a partir do original.
+
+    1. Limpa o que a roupa amostrava por engano: fundo da folha e pele.
+       (O mapa UV nao acompanha a silhueta da referencia, entao mangas, capuz
+       e barras pegavam o fundo cinza e partes do corpo.)
+    2. Pinta as amostras de cor solida dos triangulos corrigidos por
+       corrigir_uv_glb.py.
+    3. Aumenta contraste e nitidez, preservando os tons de pele das maos.
+    """
     original = Image.open(PASTA + "pescador_v29_Roupa.jpg").convert("RGB")
-    ajustada = ImageEnhance.Contrast(original).enhance(1.12)
+    largura, altura = original.size
+    o = np.asarray(original).astype(int)
+    pos, uv, indices, dominante = _glb()
+    mao = np.array([d.startswith(("hand", "finger", "thumb")) for d in dominante])
+    com_area = _triangulos_com_area(uv, indices, largura, altura)
+    e_mao = mao[indices].sum(1) >= 2
+
+    cobertura = Image.new("L", (largura, altura), 0)
+    d = ImageDraw.Draw(cobertura)
+    for tri in indices[com_area & ~e_mao]:
+        d.polygon([(float(uv[v, 0]) * largura, float(uv[v, 1]) * altura) for v in tri], fill=255)
+    cobertura = np.asarray(cobertura.filter(ImageFilter.MaxFilter(5))) > 0
+    ruim = cobertura & (_fundo(o) | _pele(o))
+    # Margem de 1 pixel: a borda do fundo vem misturada com a roupa.
+    ruim = np.asarray(Image.fromarray((ruim * 255).astype("uint8")).filter(ImageFilter.MaxFilter(3))) > 0
+    ruim &= cobertura
+    limpo = _preencher(o, ruim | (~cobertura & (_fundo(o) | _pele(o))))
+    limpo = np.where(cobertura[..., None], limpo, o).astype(int)
+
+    # Capuz por tras: a area amostrada era a sombra sob o capuz, quase preta.
+    # Recebe o camuflado do proprio capuz, copiado do close-up de costas do atlas.
+    x0, y0, x1, y1 = CAPUZ_DESTINO
+    tecido = original.crop(CAPUZ_ORIGEM).resize((x1 - x0, y1 - y0), Image.LANCZOS)
+    peso = np.ones((y1 - y0, x1 - x0))
+    borda = 8
+    rampa = np.linspace(0.0, 1.0, borda)
+    peso[-borda:, :] *= rampa[::-1][:, None]
+    peso[:6, :] *= np.linspace(0.0, 1.0, 6)[:, None]
+    peso[:, :borda] *= rampa[None, :]
+    peso[:, -borda:] *= rampa[::-1][None, :]
+    peso = peso[..., None]
+    limpo[y0:y1, x0:x1] = (np.asarray(tecido).astype(float) * peso + limpo[y0:y1, x0:x1] * (1 - peso)).astype(int)
+
+    # Amostras de cor solida.
+    dados = _amostras()
+    celula = dados["celula_px"]
+    cor_padrao = np.median(limpo[cobertura], axis=0)
+    for amostra in dados["amostras"]:
+        e_pele = mao[amostra["vertices"]].mean() > 0.5
+        pontos = []
+        for ax, ay, bx, by in amostra["linhas_originais_px"]:
+            n = int(max(abs(bx - ax), abs(by - ay))) + 2
+            xs = np.clip(np.linspace(ax, bx, n).round().astype(int), 0, largura - 1)
+            ys = np.clip(np.linspace(ay, by, n).round().astype(int), 0, altura - 1)
+            pontos.append(o[ys, xs])
+        pontos = np.concatenate(pontos)
+        validos = pontos[_pele(pontos)] if e_pele else pontos[~_fundo(pontos) & ~_pele(pontos)]
+        cor = np.median(validos, axis=0) if len(validos) else (np.median(pontos, axis=0) if e_pele else cor_padrao)
+        cx, cy = amostra["centro_px"]
+        x0, y0 = int(cx - celula / 2), int(cy - celula / 2)
+        limpo[y0:y0 + celula, x0:x0 + celula] = cor
+
+    base = Image.fromarray(limpo.astype("uint8"))
+    ajustada = ImageEnhance.Contrast(base).enhance(1.12)
     # Sem aumento de saturacao: o vermelho medido ja fica no tom da referencia.
     ajustada = ajustada.filter(ImageFilter.UnsharpMask(radius=2, percent=90, threshold=2))
-    # Pele: mantem os pixels originais para nao alterar o tom das maos.
-    o = np.asarray(original).astype(int)
-    pele = (o[..., 0] > 110) & (o[..., 0] > o[..., 2] + 40) & (o[..., 1] > o[..., 2])
+    # Pele: mantem os pixels sem ajuste para nao alterar o tom das maos.
+    pele = _pele(limpo)
     mascara = Image.fromarray((pele * 255).astype("uint8")).filter(ImageFilter.MaxFilter(5))
     mascara = mascara.filter(ImageFilter.GaussianBlur(1.5))
-    Image.composite(original, ajustada, mascara).save(PASTA + "pescador_v29_Roupa_ajustada.png")
+    Image.composite(base, ajustada, mascara).save(PASTA + "pescador_v29_Roupa_ajustada.png")
+
+
+def rosto():
+    """Refaz a parte de tras do capuz no atlas Rosto.
+
+    Essa faixa do atlas era um borrao escuro com manchas esverdeadas. Recebe o
+    camuflado do proprio capuz, copiado do close-up de costas do atlas Roupa.
+    O resto do atlas (rosto, chapeu, oculos) fica identico.
+    """
+    atlas = Image.open(PASTA + "pescador_v29_Rosto.png").convert("RGB")
+    largura, altura = atlas.size
+    gltf, acessor = _abrir_glb()
+    cabeca = gltf["meshes"][0]["primitives"][1]
+    pos = acessor(cabeca["attributes"]["POSITION"]).astype(float)
+    uv = acessor(cabeca["attributes"]["TEXCOORD_0"]).astype(float)
+    indices = acessor(cabeca["indices"]).ravel().reshape(-1, 3).astype(int)
+    centro = pos[indices].mean(1)
+    capuz = (centro[:, 1] < 1.56) & (centro[:, 2] < -0.06)
+    mascara = Image.new("L", (largura, altura), 0)
+    d = ImageDraw.Draw(mascara)
+    for tri in indices[capuz]:
+        d.polygon([(float(uv[v, 0]) * largura, float(uv[v, 1]) * altura) for v in tri], fill=255)
+    caixa = mascara.getbbox()
+    mascara = mascara.filter(ImageFilter.MaxFilter(7)).filter(ImageFilter.GaussianBlur(2))
+    tecido = Image.open(PASTA + "pescador_v29_Roupa.jpg").convert("RGB").crop(CAPUZ_ORIGEM_GRANDE)
+    tecido = tecido.resize((caixa[2] - caixa[0], caixa[3] - caixa[1]), Image.LANCZOS)
+    tecido = ImageEnhance.Contrast(tecido).enhance(1.12)
+    tecido = tecido.filter(ImageFilter.UnsharpMask(radius=2, percent=90, threshold=2))
+    camada = atlas.copy()
+    camada.paste(tecido, (caixa[0], caixa[1]))
+    Image.composite(camada, atlas, mascara).save(PASTA + "pescador_v29_Rosto_ajustado.png")
 
 
 def cabelo():
@@ -72,47 +253,28 @@ def cabelo():
 
 def calca():
     """Rasteriza no espaco UV os triangulos do corpo que pertencem a calca."""
-    with open(PASTA + "pescador_v29.glb", "rb") as f:
-        f.read(12)
-        n, _ = struct.unpack("<II", f.read(8))
-        gltf = json.loads(f.read(n))
-        n, _ = struct.unpack("<II", f.read(8))
-        binario = f.read(n)
-    comp = {"SCALAR": 1, "VEC2": 2, "VEC3": 3, "VEC4": 4}
-    tipos = {5121: "u1", 5123: "u2", 5125: "u4", 5126: "f4"}
-
-    def acessor(i):
-        a = gltf["accessors"][i]
-        bv = gltf["bufferViews"][a["bufferView"]]
-        k = comp[a["type"]]
-        dt = np.dtype(tipos[a["componentType"]])
-        inicio = bv.get("byteOffset", 0) + a.get("byteOffset", 0)
-        passo = bv.get("byteStride", k * dt.itemsize)
-        bruto = np.frombuffer(binario, dtype=np.uint8, count=(a["count"] - 1) * passo + k * dt.itemsize, offset=inicio)
-        linhas = np.lib.stride_tricks.as_strided(bruto, shape=(a["count"], k * dt.itemsize), strides=(passo, 1))
-        return np.ascontiguousarray(linhas).view(dt).reshape(a["count"], k)
-
-    prim = gltf["meshes"][0]["primitives"][0]
-    pos = acessor(prim["attributes"]["POSITION"]).astype(float)
-    uv = acessor(prim["attributes"]["TEXCOORD_0"]).astype(float)
-    juntas = acessor(prim["attributes"]["JOINTS_0"]).astype(int)
-    pesos = acessor(prim["attributes"]["WEIGHTS_0"]).astype(float)
-    indices = acessor(prim["indices"]).ravel().reshape(-1, 3)
-    nomes = [gltf["nodes"][j]["name"] for j in gltf["skins"][0]["joints"]]
-    dominante = np.array([nomes[juntas[i, pesos[i].argmax()]] for i in range(len(pos))])
+    pos, uv, indices, dominante = _glb()
     perna = np.array([d.startswith(("thigh", "shin")) for d in dominante])
     quadril = np.array([d == "root" for d in dominante]) & (pos[:, 1] < CINTURA_Y)
     calca_v = perna | quadril
     largura, altura = 768, 896
     mascara = Image.new("L", (largura, altura), 0)
     d = ImageDraw.Draw(mascara)
-    for tri in indices[calca_v[indices].sum(1) >= 2]:
-        a, b, c = uv[tri]
-        # Pecas de cor solida usam um unico ponto do atlas: ficam fora da mascara.
-        if abs((b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0])) < 1e-7:
-            continue
+    # Pecas de cor solida (um unico ponto do atlas) ficam fora desta etapa.
+    com_area = _triangulos_com_area(uv, indices, largura, altura)
+    for tri in indices[com_area & (calca_v[indices].sum(1) >= 2)]:
         d.polygon([(float(uv[v, 0]) * largura, float(uv[v, 1]) * altura) for v in tri], fill=255)
-    mascara.filter(ImageFilter.GaussianBlur(0.6)).save(PASTA + "pants_mask.png")
+    mascara = mascara.filter(ImageFilter.GaussianBlur(0.6))
+    # Amostras de cor solida que pertencem a calca (barras e cos).
+    dados = _amostras()
+    escala = largura / dados["atlas"][0]
+    meia = dados["celula_px"] * escala / 2
+    d = ImageDraw.Draw(mascara)
+    for amostra in dados["amostras"]:
+        if calca_v[amostra["vertices"]].mean() > 0.5:
+            cx, cy = amostra["centro_px"][0] * escala, amostra["centro_px"][1] * escala
+            d.rectangle([cx - meia, cy - meia, cx + meia - 1, cy + meia - 1], fill=255)
+    mascara.save(PASTA + "pants_mask.png")
 
 
 CINTURA_Y = 0.96
@@ -120,6 +282,7 @@ CINTURA_Y = 0.96
 
 if __name__ == "__main__":
     roupa()
+    rosto()
     cabelo()
     calca()
     print("texturas geradas")

@@ -12,6 +12,12 @@ const VIEWS := [
 	{"name": "head_side", "yaw": 90.0, "target": Vector3(0, 1.63, 0), "dist": 0.9, "fov": 28.0},
 	{"name": "head_back", "yaw": 180.0, "target": Vector3(0, 1.63, 0), "dist": 0.9, "fov": 28.0},
 	{"name": "head_three_quarter", "yaw": 45.0, "target": Vector3(0, 1.63, 0), "dist": 0.9, "fov": 28.0},
+	{"name": "torso_front", "yaw": 0.0, "target": Vector3(0, 1.25, 0), "dist": 1.7, "fov": 30.0},
+	{"name": "torso_side", "yaw": 90.0, "target": Vector3(0, 1.25, 0), "dist": 1.7, "fov": 30.0},
+	{"name": "torso_back", "yaw": 180.0, "target": Vector3(0, 1.25, 0), "dist": 1.7, "fov": 30.0},
+	{"name": "torso_three_quarter", "yaw": 45.0, "target": Vector3(0, 1.25, 0), "dist": 1.7, "fov": 30.0},
+	{"name": "legs_front", "yaw": 0.0, "target": Vector3(0, 0.55, 0), "dist": 2.0, "fov": 30.0},
+	{"name": "legs_side", "yaw": 90.0, "target": Vector3(0, 0.55, 0), "dist": 2.0, "fov": 30.0},
 	{"name": "feet_front", "yaw": 0.0, "target": Vector3(0, 0.15, 0.05), "dist": 1.2, "fov": 30.0},
 	{"name": "feet_side", "yaw": 90.0, "target": Vector3(0, 0.15, 0.05), "dist": 1.2, "fov": 30.0},
 ]
